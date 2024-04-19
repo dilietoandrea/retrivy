@@ -1,27 +1,29 @@
 
 # RETRIVY
 
-**Tool per generare report di vulnerabilità utilizzando il risultato di una scansione con trivy ([trivy.dev](https://trivy.dev/))**
+Tool per generare report di vulnerabilità utilizzando il risultato di una scansione con trivy ([trivy.dev](https://trivy.dev))
 
 ## INPUT
 
-- **results.json**
+`results.json`
   - File json risultato della scansione con trivy
   - Comando di scansione:
-	- analizzando i file:
-		- `requirements.txt`
-		- `composer.lock`
-		- ...
-	- genera il file:
-		- `results.json`
- ```bash
-trivy fs --scanners vuln --format json -o results.json .
-```
+    ```bash
+    trivy fs --scanners vuln --format json -o results.json .
+    ```
+  	Con questo comando Trivy cercherà nella cartella corrente i file di gestione delle dipendenze (requirements.txt, composer.lock, package-lock.json,...) riportando le vulnerabilità individuate nel file results.json 
+
+
+
+
+
+
+
 
 ## OUTPUT
 
-- File html contenente un report sulle vulnerabilità individuate in `results.json`
-
+`File html` 
+  - Report in formato html sulle vulnerabilità individuate in results.json
 
 ## UTILIZZO
 
