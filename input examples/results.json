@@ -1,0 +1,506 @@
+{
+  "SchemaVersion": 2,
+  "CreatedAt": "2024-04-11T12:53:04.923470156+02:00",
+  "ArtifactName": ".",
+  "ArtifactType": "filesystem",
+  "Metadata": {
+    "ImageConfig": {
+      "architecture": "",
+      "created": "0001-01-01T00:00:00Z",
+      "os": "",
+      "rootfs": {
+        "type": "",
+        "diff_ids": null
+      },
+      "config": {}
+    }
+  },
+  "Results": [
+    {
+      "Target": "composer.lock",
+      "Class": "lang-pkgs",
+      "Type": "composer",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2023-29197",
+          "PkgID": "guzzlehttp/psr7@2.4.0",
+          "PkgName": "guzzlehttp/psr7",
+          "PkgIdentifier": {
+            "PURL": "pkg:composer/guzzlehttp/psr7@2.4.0"
+          },
+          "InstalledVersion": "2.4.0",
+          "FixedVersion": "2.4.5, 1.9.1",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "nvd",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2023-29197",
+          "DataSource": {
+            "ID": "php-security-advisories",
+            "Name": "PHP Security Advisories Database",
+            "URL": "https://github.com/FriendsOfPHP/security-advisories"
+          },
+          "Title": "guzzlehttp/psr7 is a PSR-7 HTTP message library implementation in PHP. ...",
+          "Description": "guzzlehttp/psr7 is a PSR-7 HTTP message library implementation in PHP. Affected versions are subject to improper header parsing. An attacker could sneak in a newline (\\n) into both the header names and values. While the specification states that \\r\\n\\r\\n is used to terminate the header list, many servers in the wild will also accept \\n\\n. This is a follow-up to CVE-2022-24775 where the fix was incomplete. The issue has been patched in versions 1.9.1 and 2.4.5. There are no known workarounds for this vulnerability. Users are advised to upgrade.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-436"
+          ],
+          "VendorSeverity": {
+            "ghsa": 2,
+            "nvd": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+              "V3Score": 5.3
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=2022-24775",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-29197",
+            "https://github.com/FriendsOfPHP/security-advisories/blob/master/guzzlehttp/psr7/CVE-2023-29197.yaml",
+            "https://github.com/Nyholm/psr7/commit/1029a2671cbdd3e075a21952082c2be7c8018426 (1.6.1)",
+            "https://github.com/Nyholm/psr7/security/advisories/GHSA-wjfc-pgfp-pv9c",
+            "https://github.com/guzzle/psr7",
+            "https://github.com/guzzle/psr7/commit/0454e12ef0cd597ccd2adb036f7bda4e7fface66 (2.4.5)",
+            "https://github.com/guzzle/psr7/security/advisories/GHSA-q7rv-6hp3-vh96",
+            "https://github.com/guzzle/psr7/security/advisories/GHSA-wxmh-65f7-jcvw",
+            "https://lists.debian.org/debian-lts-announce/2023/12/msg00028.html",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/FJANWDXJZE5BGLN4MQ4FEHV5LJ6CMKQF",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/FJANWDXJZE5BGLN4MQ4FEHV5LJ6CMKQF/",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/O35UN4IK6VS2LXSRWUDFWY7NI73RKY2U",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/O35UN4IK6VS2LXSRWUDFWY7NI73RKY2U/",
+            "https://nvd.nist.gov/vuln/detail/CVE-2023-29197",
+            "https://ubuntu.com/security/notices/USN-6670-1",
+            "https://ubuntu.com/security/notices/USN-6671-1",
+            "https://www.rfc-editor.org/rfc/rfc7230#section-3.2.4"
+          ],
+          "PublishedDate": "2023-04-17T22:15:09.947Z",
+          "LastModifiedDate": "2024-01-01T01:15:20.317Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2022-24894",
+          "PkgID": "symfony/http-kernel@v6.1.3",
+          "PkgName": "symfony/http-kernel",
+          "PkgIdentifier": {
+            "PURL": "pkg:composer/symfony/http-kernel@v6.1.3"
+          },
+          "InstalledVersion": "v6.1.3",
+          "FixedVersion": "4.0.0, 4.4.50, 2.2.0, 3.2.0, 4.1.0, 6.0.20, 2.4.0, 2.3.0, 3.1.0, 5.1.0, 5.4.20, 6.2.6, 2.1.0, 2.8.0, 2.7.0, 5.2.0, 2.6.0, 4.3.0, 4.4.0, 5.4.0, 5.3.0, 6.1.12, 3.3.0, 3.0.0, 3.4.0, 4.2.0, 2.5.0",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "nvd",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-24894",
+          "DataSource": {
+            "ID": "php-security-advisories",
+            "Name": "PHP Security Advisories Database",
+            "URL": "https://github.com/FriendsOfPHP/security-advisories"
+          },
+          "Title": "Symfony is a PHP framework for web and console applications and a set  ...",
+          "Description": "Symfony is a PHP framework for web and console applications and a set of reusable PHP components. The Symfony HTTP cache system, acts as a reverse proxy: It caches entire responses (including headers) and returns them to the clients. In a recent change in the `AbstractSessionListener`, the response might contain a `Set-Cookie` header. If the Symfony HTTP cache system is enabled, this response might bill stored and return to the next clients. An attacker can use this vulnerability to retrieve the victim's session. This issue has been patched and is available for branch 4.4.\n",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-285"
+          ],
+          "VendorSeverity": {
+            "ghsa": 2,
+            "nvd": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:H/I:L/A:L",
+              "V3Score": 5.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
+              "V3Score": 8.8
+            }
+          },
+          "References": [
+            "https://github.com/FriendsOfPHP/security-advisories/blob/master/symfony/http-kernel/CVE-2022-24894.yaml",
+            "https://github.com/FriendsOfPHP/security-advisories/blob/master/symfony/symfony/CVE-2022-24894.yaml",
+            "https://github.com/symfony/symfony",
+            "https://github.com/symfony/symfony/commit/d2f6322af9444ac5cd1ef3ac6f280dbef7f9d1fb",
+            "https://github.com/symfony/symfony/security/advisories/GHSA-h7vf-5wrv-9fhv",
+            "https://lists.debian.org/debian-lts-announce/2023/07/msg00014.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2022-24894",
+            "https://symfony.com/cve-2022-24894"
+          ],
+          "PublishedDate": "2023-02-03T22:15:10.823Z",
+          "LastModifiedDate": "2023-07-12T01:15:08.913Z"
+        }
+      ]
+    },
+    {
+      "Target": "requirements.txt",
+      "Class": "lang-pkgs",
+      "Type": "pip",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2023-50782",
+          "PkgName": "cryptography",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/cryptography@41.0.2"
+          },
+          "InstalledVersion": "41.0.2",
+          "FixedVersion": "42.0.0",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2023-50782",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "python-cryptography: Bleichenbacher timing oracle attack against RSA decryption - incomplete fix for CVE-2020-25659",
+          "Description": "A flaw was found in the python-cryptography package. This issue may allow a remote attacker to decrypt captured messages in TLS servers that use RSA key exchanges, which may lead to exposure of confidential or sensitive data.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-203",
+            "CWE-208"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "photon": 3,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2023-50782",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2254432",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-50782",
+            "https://github.com/openssl/openssl/pull/13817",
+            "https://github.com/pyca/cryptography",
+            "https://github.com/pyca/cryptography/issues/9785",
+            "https://nvd.nist.gov/vuln/detail/CVE-2023-50782",
+            "https://people.redhat.com/~hkario/marvin/",
+            "https://ubuntu.com/security/notices/USN-6663-1",
+            "https://ubuntu.com/security/notices/USN-6673-1",
+            "https://ubuntu.com/security/notices/USN-6673-2",
+            "https://www.cve.org/CVERecord?id=CVE-2023-50782"
+          ],
+          "PublishedDate": "2024-02-05T21:15:11.183Z",
+          "LastModifiedDate": "2024-02-26T16:27:48.08Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2024-26130",
+          "PkgName": "cryptography",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/cryptography@41.0.2"
+          },
+          "InstalledVersion": "41.0.2",
+          "FixedVersion": "42.0.4",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2024-26130",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "python-cryptography: NULL pointer dereference with pkcs12.serialize_key_and_certificates when called with a non-matching certificate and private key and an hmac_hash override",
+          "Description": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers. Starting in version 38.0.0 and prior to version 42.0.4, if `pkcs12.serialize_key_and_certificates` is called with both a certificate whose public key did not match the provided private key and an `encryption_algorithm` with `hmac_hash` set (via `PrivateFormat.PKCS12.encryption_builder().hmac_hash(...)`, then a NULL pointer dereference would occur, crashing the Python process. This has been resolved in version 42.0.4, the first version in which a `ValueError` is properly raised.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-476"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "photon": 3,
+            "redhat": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2024-26130",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-26130",
+            "https://github.com/pyca/cryptography",
+            "https://github.com/pyca/cryptography/commit/97d231672763cdb5959a3b191e692a362f1b9e55",
+            "https://github.com/pyca/cryptography/pull/10423",
+            "https://github.com/pyca/cryptography/security/advisories/GHSA-6vqw-3v5j-54x4",
+            "https://nvd.nist.gov/vuln/detail/CVE-2024-26130",
+            "https://ubuntu.com/security/notices/USN-6673-1",
+            "https://www.cve.org/CVERecord?id=CVE-2024-26130"
+          ],
+          "PublishedDate": "2024-02-21T17:15:09.863Z",
+          "LastModifiedDate": "2024-02-22T19:07:27.197Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2023-49083",
+          "PkgName": "cryptography",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/cryptography@41.0.2"
+          },
+          "InstalledVersion": "41.0.2",
+          "FixedVersion": "41.0.6",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2023-49083",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "python-cryptography: NULL-dereference when loading PKCS7 certificates",
+          "Description": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers. Calling `load_pem_pkcs7_certificates` or `load_der_pkcs7_certificates` could lead to a NULL-pointer dereference and segfault. Exploitation of this vulnerability poses a serious risk of Denial of Service (DoS) for any application attempting to deserialize a PKCS7 blob/certificate. The consequences extend to potential disruptions in system availability and stability. This vulnerability has been patched in version 41.0.6.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-476"
+          ],
+          "VendorSeverity": {
+            "amazon": 2,
+            "cbl-mariner": 2,
+            "ghsa": 2,
+            "nvd": 3,
+            "oracle-oval": 2,
+            "photon": 3,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 5.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2023/11/29/2",
+            "https://access.redhat.com/security/cve/CVE-2023-49083",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-49083",
+            "https://github.com/pyca/cryptography",
+            "https://github.com/pyca/cryptography/commit/f09c261ca10a31fe41b1262306db7f8f1da0e48a",
+            "https://github.com/pyca/cryptography/pull/9926",
+            "https://github.com/pyca/cryptography/security/advisories/GHSA-jfhm-5ghh-2f97",
+            "https://github.com/pypa/advisory-database/tree/main/vulns/cryptography/PYSEC-2023-254.yaml",
+            "https://linux.oracle.com/cve/CVE-2023-49083.html",
+            "https://linux.oracle.com/errata/ELSA-2024-19480.html",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/QMNTYMUGFJSDBYBU22FUYBHFRZODRKXV",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/QMNTYMUGFJSDBYBU22FUYBHFRZODRKXV/",
+            "https://nvd.nist.gov/vuln/detail/CVE-2023-49083",
+            "https://ubuntu.com/security/notices/USN-6539-1",
+            "https://www.cve.org/CVERecord?id=CVE-2023-49083"
+          ],
+          "PublishedDate": "2023-11-29T19:15:07.967Z",
+          "LastModifiedDate": "2024-02-17T02:15:45.35Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2024-0727",
+          "PkgName": "cryptography",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/cryptography@41.0.2"
+          },
+          "InstalledVersion": "41.0.2",
+          "FixedVersion": "42.0.2",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2024-0727",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "openssl: denial of service via null dereference",
+          "Description": "Issue summary: Processing a maliciously formatted PKCS12 file may lead OpenSSL\nto crash leading to a potential Denial of Service attack\n\nImpact summary: Applications loading files in the PKCS12 format from untrusted\nsources might terminate abruptly.\n\nA file in PKCS12 format can contain certificates and keys and may come from an\nuntrusted source. The PKCS12 specification allows certain fields to be NULL, but\nOpenSSL does not correctly check for this case. This can lead to a NULL pointer\ndereference that results in OpenSSL crashing. If an application processes PKCS12\nfiles from an untrusted source using the OpenSSL APIs then that application will\nbe vulnerable to this issue.\n\nOpenSSL APIs that are vulnerable to this are: PKCS12_parse(),\nPKCS12_unpack_p7data(), PKCS12_unpack_p7encdata(), PKCS12_unpack_authsafes()\nand PKCS12_newpass().\n\nWe have also fixed a similar issue in SMIME_write_PKCS7(). However since this\nfunction is related to writing data we do not consider it security significant.\n\nThe FIPS modules in 3.2, 3.1 and 3.0 are not affected by this issue.",
+          "Severity": "MEDIUM",
+          "VendorSeverity": {
+            "amazon": 3,
+            "cbl-mariner": 2,
+            "ghsa": 2,
+            "nvd": 2,
+            "photon": 2,
+            "redhat": 1,
+            "ubuntu": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H",
+              "V3Score": 5.5
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H",
+              "V3Score": 5.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H",
+              "V3Score": 5.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2024-0727",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-0727",
+            "https://github.com/alexcrichton/openssl-src-rs/commit/add20f73b6b42be7451af2e1044d4e0e778992b2",
+            "https://github.com/github/advisory-database/pull/3472",
+            "https://github.com/openssl/openssl/commit/09df4395b5071217b76dc7d3d2e630eb8c5a79c2",
+            "https://github.com/openssl/openssl/commit/775acfdbd0c6af9ac855f34969cdab0c0c90844a",
+            "https://github.com/openssl/openssl/commit/d135eeab8a5dbf72b3da5240bab9ddb7678dbd2c",
+            "https://github.com/openssl/openssl/pull/23362",
+            "https://github.com/pyca/cryptography/commit/3519591d255d4506fbcd0d04037d45271903c64d",
+            "https://github.openssl.org/openssl/extended-releases/commit/03b3941d60c4bce58fab69a0c22377ab439bc0e8",
+            "https://github.openssl.org/openssl/extended-releases/commit/aebaa5883e31122b404e450732dc833dc9dee539",
+            "https://nvd.nist.gov/vuln/detail/CVE-2024-0727",
+            "https://security.netapp.com/advisory/ntap-20240208-0006",
+            "https://security.netapp.com/advisory/ntap-20240208-0006/",
+            "https://ubuntu.com/security/notices/USN-6622-1",
+            "https://ubuntu.com/security/notices/USN-6632-1",
+            "https://ubuntu.com/security/notices/USN-6709-1",
+            "https://www.cve.org/CVERecord?id=CVE-2024-0727",
+            "https://www.openssl.org/news/secadv/20240125.txt"
+          ],
+          "PublishedDate": "2024-01-26T09:15:07.637Z",
+          "LastModifiedDate": "2024-02-08T10:15:13.91Z"
+        },
+        {
+          "VulnerabilityID": "GHSA-jm77-qphf-c4w8",
+          "PkgName": "cryptography",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/cryptography@41.0.2"
+          },
+          "InstalledVersion": "41.0.2",
+          "FixedVersion": "41.0.3",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://github.com/advisories/GHSA-jm77-qphf-c4w8",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "pyca/cryptography's wheels include vulnerable OpenSSL",
+          "Description": "pyca/cryptography's wheels include a statically linked copy of OpenSSL. The versions of OpenSSL included in cryptography 0.8-41.0.2 are vulnerable to several security issues. More details about the vulnerabilities themselves can be found in https://www.openssl.org/news/secadv/20230731.txt, https://www.openssl.org/news/secadv/20230719.txt, and https://www.openssl.org/news/secadv/20230714.txt.\n\nIf you are building cryptography source (\"sdist\") then you are responsible for upgrading your copy of OpenSSL. Only users installing from wheels built by the cryptography project (i.e., those distributed on PyPI) need to update their cryptography versions.",
+          "Severity": "LOW",
+          "VendorSeverity": {
+            "ghsa": 1
+          },
+          "References": [
+            "https://github.com/pyca/cryptography",
+            "https://github.com/pyca/cryptography/commit/b22271cf3c3dd8dc8978f8f4b00b5c7060b6538d",
+            "https://github.com/pyca/cryptography/commit/bfa4d95f0f356f2d535efd5c775e0fb3efe90ef2",
+            "https://github.com/pyca/cryptography/security/advisories/GHSA-jm77-qphf-c4w8",
+            "https://www.openssl.org/news/secadv/20230714.txt",
+            "https://www.openssl.org/news/secadv/20230719.txt",
+            "https://www.openssl.org/news/secadv/20230731.txt"
+          ]
+        },
+        {
+          "VulnerabilityID": "GHSA-v8gr-m533-ghj9",
+          "PkgName": "cryptography",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/cryptography@41.0.2"
+          },
+          "InstalledVersion": "41.0.2",
+          "FixedVersion": "41.0.4",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://github.com/advisories/GHSA-v8gr-m533-ghj9",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "Vulnerable OpenSSL included in cryptography wheels",
+          "Description": "pyca/cryptography's wheels include a statically linked copy of OpenSSL. The versions of OpenSSL included in cryptography 2.5-41.0.3 are vulnerable to several security issues. More details about the vulnerabilities themselves can be found in https://www.openssl.org/news/secadv/20230908.txt.\n\nIf you are building cryptography source (\"sdist\") then you are responsible for upgrading your copy of OpenSSL. Only users installing from wheels built by the cryptography project (i.e., those distributed on PyPI) need to update their cryptography versions.",
+          "Severity": "LOW",
+          "VendorSeverity": {
+            "ghsa": 1
+          },
+          "References": [
+            "https://github.com/pyca/cryptography",
+            "https://github.com/pyca/cryptography/commit/fc11bce6930e591ce26a2317b31b9ce2b3e25512",
+            "https://github.com/pyca/cryptography/security/advisories/GHSA-v8gr-m533-ghj9"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2024-28219",
+          "PkgName": "pillow",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/pillow@10.2.0"
+          },
+          "InstalledVersion": "10.2.0",
+          "FixedVersion": "10.3.0",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2024-28219",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "python-pillow: buffer overflow in _imagingcms.c",
+          "Description": "In _imagingcms.c in Pillow before 10.3.0, a buffer overflow exists because strcpy is used instead of strncpy.",
+          "Severity": "MEDIUM",
+          "VendorSeverity": {
+            "ghsa": 2,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:H/I:H/A:H",
+              "V3Score": 6.7
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H",
+              "V3Score": 7.3
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2024-28219",
+            "https://github.com/python-pillow/Pillow",
+            "https://github.com/python-pillow/Pillow/commit/2a93aba5cfcf6e241ab4f9392c13e3b74032c061",
+            "https://lists.debian.org/debian-lts-announce/2024/04/msg00008.html",
+            "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/4XLPUT3VK4GQ6EVY525TT2QNUIXNRU5M",
+            "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/4XLPUT3VK4GQ6EVY525TT2QNUIXNRU5M/",
+            "https://nvd.nist.gov/vuln/detail/CVE-2024-28219",
+            "https://pillow.readthedocs.io/en/stable/releasenotes/10.3.0.html#security",
+            "https://www.cve.org/CVERecord?id=CVE-2024-28219"
+          ],
+          "PublishedDate": "2024-04-03T03:15:09.71Z",
+          "LastModifiedDate": "2024-04-10T22:15:07.193Z"
+        }
+      ]
+    }
+  ]
+}
