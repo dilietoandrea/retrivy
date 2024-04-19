@@ -8,14 +8,15 @@
 - **results.json**
   - File json risultato della scansione con trivy
   - Comando di scansione:
-    ```bash
-    trivy fs --scanners vuln --format json -o results.json .
-    ```
-  - Analizzando i file:
-    - `requirements.txt`
-    - `composer.lock`
-  - Genera il file:
-    - `results.json`
+		```bash
+		trivy fs --scanners vuln --format json -o results.json .
+		```
+	  - Analizzando i file:
+		- `requirements.txt`
+		- `composer.lock`
+		- ...
+	  - Genera il file:
+		- `results.json`
 
 ## OUTPUT
 
