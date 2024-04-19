@@ -13,13 +13,6 @@ Tool per generare report di vulnerabilità utilizzando il risultato di una scans
     ```
   	Con questo comando Trivy cercherà nella cartella corrente i file di gestione delle dipendenze (requirements.txt, composer.lock, package-lock.json,...) riportando le vulnerabilità individuate nel file results.json 
 
-
-
-
-
-
-
-
 ## OUTPUT
 
 `File html` 
