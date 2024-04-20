@@ -2,11 +2,16 @@ import os
 import json
 from datetime import datetime
 
+def format_date(iso_string):
+    # Converte una stringa ISO 8601 nel formato "Data - Ora - Offset di fuso orario"
+    date_time = datetime.fromisoformat(iso_string)
+    return date_time.strftime("%Y-%m-%d %H:%M:%S %z")
+
 def load_js_file(js_file_path):
     with open(js_file_path, 'r') as file:
         return file.read()
 
-def generate_html_report(vulnerabilities, report_title, results_type, js_directory):
+def generate_html_report(vulnerabilities, report_title, results_type, js_directory, json_created_at):
     # Calcolo del riepilogo
     severity_counts = {'UNKNOWN': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0, 'CRITICAL': 0}
     for v in vulnerabilities:
@@ -117,6 +122,7 @@ def generate_html_report(vulnerabilities, report_title, results_type, js_directo
     </head>
     <body>
         <h1>{report_title}</h1>
+        <h2>json generated on {json_created_at}</h2>
         <h2>Type: {results_type}</h2>
         <p style="text-align: center; font-size: 20px;"><strong>{summary_line}</strong></p>
         <table id="sortable-table">
@@ -147,32 +153,23 @@ def read_json_input(file_path):
         data = json.load(file)
     vulnerabilities = data['Results'][0]['Vulnerabilities']
     results_type = data["Results"][0]["Type"]
-    return [vulnerabilities, results_type]
-
-def format_title(created_at):
-    # Funzione per formattare la data e l'ora come nel titolo fornito nell'immagine
-    created_datetime = datetime.fromisoformat(created_at)
-    return created_datetime.strftime("Trivy Report - %Y-%m-%d %H:%M:%S")
+    json_created_at = data['CreatedAt']
+    return vulnerabilities, results_type, json_created_at
 
 def main(json_file_path):
     # Leggi le vulnerabilità dal file JSON
-    vulnerabilities, results_type = read_json_input(json_file_path)
-    report_title = "Report Title"  # Modifica con il titolo desiderato
-
+    vulnerabilities, results_type, json_created_at = read_json_input(json_file_path)
     
     # Ottieni la data e l'ora correnti nel formato desiderato per il nome del file
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     output_html_filename = f"trivy_report_{timestamp}.html"
     output_html_path = f"./{output_html_filename}"  # Salva il file nella directory corrente
     
-    # Ottieni la data di creazione dal JSON per il titolo del report
-    with open(json_file_path, 'r') as file:
-        json_data = json.load(file)
-    created_at = json_data['CreatedAt']
-    report_title = format_title(created_at)
-    
+    formatted_json_created_at = format_date(json_created_at)
+    formatted_html_created_at = format_date(datetime.now().isoformat())
+    report_title = datetime.now().strftime(f"Trivy Report - {formatted_html_created_at}")
     # Genera il report HTML
-    html_report = generate_html_report(vulnerabilities, report_title, results_type, js_directory)
+    html_report = generate_html_report(vulnerabilities, report_title, results_type, js_directory, formatted_json_created_at)
     
     # Scrivi il report HTML sul file di output
     with open(output_html_path, 'w') as file:
