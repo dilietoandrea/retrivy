@@ -1,11 +1,36 @@
-import os
 import json
-from datetime import datetime
+import os
+from datetime import datetime, timezone
 
 def format_date(iso_string):
-    # Converte una stringa ISO 8601 nel formato "Data - Ora - Offset di fuso orario"
-    date_time = datetime.fromisoformat(iso_string)
-    return date_time.strftime("%Y-%m-%d %H:%M:%S %z")
+    try:
+        # Tentativo di convertire direttamente la stringa ISO in datetime
+        if iso_string.endswith('Z'):
+            # Rimuovi 'Z' dalla fine della stringa
+            clean_iso_string = iso_string[:-1]
+        else:
+            clean_iso_string = iso_string
+        
+        date_time = datetime.fromisoformat(clean_iso_string)
+    except ValueError:
+        # Se il primo tentativo fallisce, tratta i microsecondi in eccesso
+        if '.' in iso_string:
+            parts = iso_string.split('.')
+            seconds = parts[0]
+            microseconds = parts[1][:6]  # Tronca i microsecondi a 6 cifre
+            clean_iso_string = f"{seconds}.{microseconds}"
+            clean_iso_string = clean_iso_string.rstrip('Z')  # Rimuove 'Z' se presente
+
+        date_time = datetime.fromisoformat(clean_iso_string)
+    
+    # Aggiungi il fuso orario UTC se la stringa originale terminava con 'Z'
+    if iso_string.endswith('Z'):
+        date_time = date_time.replace(tzinfo=timezone.utc)
+
+    # Formatta la data e l'ora nel formato desiderato
+    formatted_date_time = date_time.strftime("%Y-%m-%d %H:%M:%S %z")
+    
+    return formatted_date_time
 
 def load_js_file(js_file_path):
     with open(js_file_path, 'r') as file:
@@ -146,15 +171,36 @@ def generate_html_report(vulnerabilities, report_title, results_type, js_directo
     
     return html_report
 
+"""
+def read_json_input(file_path):
+  # Funzione per leggere il file JSON e restituire i dati delle vulnerabilità
+  with open(file_path, 'r') as file:
+      data = json.load(file)
+  vulnerabilities = data['Results'][0]['Vulnerabilities']
+  results_type = data["Results"][0]["Type"]
+  json_created_at = data['CreatedAt']
+  return vulnerabilities, results_type, json_created_at
+"""
+
 
 def read_json_input(file_path):
     # Funzione per leggere il file JSON e restituire i dati delle vulnerabilità
     with open(file_path, 'r') as file:
         data = json.load(file)
+    
+    # Estrai i dati delle vulnerabilità
     vulnerabilities = data['Results'][0]['Vulnerabilities']
     results_type = data["Results"][0]["Type"]
-    json_created_at = data['CreatedAt']
+    
+    # Gestisci il caso in cui 'CreatedAt' non sia presente nel dizionario
+    try:
+        json_created_at = data['CreatedAt']
+    except KeyError:
+        print("Attenzione: 'CreatedAt' non presente nel file JSON.")
+        json_created_at = None
+    
     return vulnerabilities, results_type, json_created_at
+
 
 def main(json_file_path):
     # Leggi le vulnerabilità dal file JSON
@@ -167,7 +213,7 @@ def main(json_file_path):
     
     formatted_json_created_at = format_date(json_created_at)
     formatted_html_created_at = format_date(datetime.now().isoformat())
-    report_title = datetime.now().strftime(f"Trivy Report - {formatted_html_created_at}")
+    report_title = (f"Trivy Report - {formatted_html_created_at}")
     # Genera il report HTML
     html_report = generate_html_report(vulnerabilities, report_title, results_type, js_directory, formatted_json_created_at)
     
