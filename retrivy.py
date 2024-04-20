@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-def generate_html_report(vulnerabilities, report_title, results_type, sortable_js_path):
+def generate_html_report(vulnerabilities, report_title, results_type, sortable_js_path, toggleReferences_js_path):
     # Calcolo del riepilogo
     severity_counts = {'UNKNOWN': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0, 'CRITICAL': 0}
     for v in vulnerabilities:
@@ -11,9 +11,13 @@ def generate_html_report(vulnerabilities, report_title, results_type, sortable_j
     total_vulnerabilities = sum(severity_counts.values())
     summary_line = f"Total vulnerabilities: {total_vulnerabilities} (UNKNOWN: {severity_counts['UNKNOWN']}, LOW: {severity_counts['LOW']}, MEDIUM: {severity_counts['MEDIUM']}, HIGH: {severity_counts['HIGH']}, CRITICAL: {severity_counts['CRITICAL']})"
 
-    # Leggi il contenuto del file JavaScript
+    # Leggi il contenuto del file sortable.js
     with open(sortable_js_path, 'r') as file:
         sortable_js_code = file.read()
+
+    # Leggi il contenuto del file toggleReferences.js
+    with open(toggleReferences_js_path, 'r') as file:
+        toggleReferences_js_code = file.read()
 
     # Generazione delle righe della tabella
     rows = "".join([
@@ -44,18 +48,7 @@ def generate_html_report(vulnerabilities, report_title, results_type, sortable_j
     <html>
     <head>
         <title>{report_title}</title>
-        <script>
-        function toggleReferences(element) {{
-            var references = element.nextElementSibling;
-            if (references.style.display === "none") {{
-                references.style.display = "block";
-                element.innerText = "Hide References";
-            }} else {{
-                references.style.display = "none";
-                element.innerText = "Show References";
-            }}
-        }}
-        </script>
+        <script>{toggleReferences_js_code}</script>
         <script>{sortable_js_code}</script>
         <script src="sortable.js"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -178,7 +171,7 @@ def main(json_file_path):
     report_title = format_title(created_at)
     
     # Genera il report HTML
-    html_report = generate_html_report(vulnerabilities, report_title, results_type, sortable_js_path)
+    html_report = generate_html_report(vulnerabilities, report_title, results_type, sortable_js_path, toggleReferences_js_path)
     
     # Scrivi il report HTML sul file di output
     with open(output_html_path, 'w') as file:
@@ -188,6 +181,7 @@ def main(json_file_path):
 # Definisci qui il percorso del file JSON e dove vuoi che il report HTML sia salvato
 json_file_path = 'results.json'
 sortable_js_path = 'sortable.js'
+toggleReferences_js_path = 'toggleReferences.js'
 output_html_path = 'report.html'
 
 # Esegui lo script principale
