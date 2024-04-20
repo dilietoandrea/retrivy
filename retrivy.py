@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-def generate_html_report(vulnerabilities, report_title, results_type):
+def generate_html_report(vulnerabilities, report_title, results_type, sortable_js_path):
     # Calcolo del riepilogo
     severity_counts = {'UNKNOWN': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0, 'CRITICAL': 0}
     for v in vulnerabilities:
@@ -10,8 +10,12 @@ def generate_html_report(vulnerabilities, report_title, results_type):
     
     total_vulnerabilities = sum(severity_counts.values())
     summary_line = f"Total vulnerabilities: {total_vulnerabilities} (UNKNOWN: {severity_counts['UNKNOWN']}, LOW: {severity_counts['LOW']}, MEDIUM: {severity_counts['MEDIUM']}, HIGH: {severity_counts['HIGH']}, CRITICAL: {severity_counts['CRITICAL']})"
-    
-    # Generazione delle righe della tabella con l'uso delle classi per la severità
+
+    # Leggi il contenuto del file JavaScript
+    with open(sortable_js_path, 'r') as file:
+        sortable_js_code = file.read()
+
+    # Generazione delle righe della tabella
     rows = "".join([
         f"""
         <tr class="severity-{v['Severity']}">
@@ -52,6 +56,7 @@ def generate_html_report(vulnerabilities, report_title, results_type):
             }}
         }}
         </script>
+        <script>{sortable_js_code}</script>
         <script src="sortable.js"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <style>
@@ -173,7 +178,7 @@ def main(json_file_path):
     report_title = format_title(created_at)
     
     # Genera il report HTML
-    html_report = generate_html_report(vulnerabilities, report_title, results_type)
+    html_report = generate_html_report(vulnerabilities, report_title, results_type, sortable_js_path)
     
     # Scrivi il report HTML sul file di output
     with open(output_html_path, 'w') as file:
@@ -182,6 +187,7 @@ def main(json_file_path):
 
 # Definisci qui il percorso del file JSON e dove vuoi che il report HTML sia salvato
 json_file_path = 'results.json'
+sortable_js_path = 'sortable.js'
 output_html_path = 'report.html'
 
 # Esegui lo script principale
