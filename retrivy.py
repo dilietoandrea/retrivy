@@ -1,7 +1,12 @@
+import os
 import json
 from datetime import datetime
 
-def generate_html_report(vulnerabilities, report_title, results_type, sortable_js_path, toggleReferences_js_path):
+def load_js_file(js_file_path):
+    with open(js_file_path, 'r') as file:
+        return file.read()
+
+def generate_html_report(vulnerabilities, report_title, results_type, js_directory):
     # Calcolo del riepilogo
     severity_counts = {'UNKNOWN': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0, 'CRITICAL': 0}
     for v in vulnerabilities:
@@ -11,13 +16,9 @@ def generate_html_report(vulnerabilities, report_title, results_type, sortable_j
     total_vulnerabilities = sum(severity_counts.values())
     summary_line = f"Total vulnerabilities: {total_vulnerabilities} (UNKNOWN: {severity_counts['UNKNOWN']}, LOW: {severity_counts['LOW']}, MEDIUM: {severity_counts['MEDIUM']}, HIGH: {severity_counts['HIGH']}, CRITICAL: {severity_counts['CRITICAL']})"
 
-    # Leggi il contenuto del file sortable.js
-    with open(sortable_js_path, 'r') as file:
-        sortable_js_code = file.read()
-
-    # Leggi il contenuto del file toggleReferences.js
-    with open(toggleReferences_js_path, 'r') as file:
-        toggleReferences_js_code = file.read()
+    # Carica specifici file JavaScript
+    sortable_js_code = load_js_file(os.path.join(js_directory, 'sortable.js'))
+    toggleReferences_js_code = load_js_file(os.path.join(js_directory, 'toggleReferences.js'))
 
     # Generazione delle righe della tabella
     rows = "".join([
@@ -171,18 +172,17 @@ def main(json_file_path):
     report_title = format_title(created_at)
     
     # Genera il report HTML
-    html_report = generate_html_report(vulnerabilities, report_title, results_type, sortable_js_path, toggleReferences_js_path)
+    html_report = generate_html_report(vulnerabilities, report_title, results_type, js_directory)
     
     # Scrivi il report HTML sul file di output
     with open(output_html_path, 'w') as file:
         file.write(html_report)
     print(f"Report saved to {output_html_path}")
 
-# Definisci qui il percorso del file JSON e dove vuoi che il report HTML sia salvato
+# Percorsi dei file e directory
+js_directory = 'js/'
 json_file_path = 'results.json'
-sortable_js_path = 'sortable.js'
-toggleReferences_js_path = 'toggleReferences.js'
-output_html_path = 'report.html'
+#output_html_path = 'report.html'
 
 # Esegui lo script principale
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-// Contenuto del file sortable.js
 var currentSort = { columnIndex: null, direction: 'asc' };
 
 function customSeveritySort(a, b) {
