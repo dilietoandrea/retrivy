@@ -44,7 +44,7 @@ def load_css_file(css_file_path):
     with open(css_file_path, 'r') as file:
         return file.read()
 
-def generate_html_report(vulnerabilities, report_title, results_type,css_directory, js_directory, json_created_at):
+def generate_html_report(vulnerabilities, report_title, results_type,css_directory, js_directory, formatted_json_created_at):
     # Calcolo del riepilogo
     severity_counts = {'UNKNOWN': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0, 'CRITICAL': 0}
     for v in vulnerabilities:
@@ -99,7 +99,7 @@ def generate_html_report(vulnerabilities, report_title, results_type,css_directo
     </head>
     <body>
         <h1>{report_title}</h1>
-        <h2>json generated on {json_created_at}</h2>
+        <h2>json generated on {formatted_json_created_at}</h2>
         <h2>Type: {results_type}</h2>
         <p style="text-align: center; font-size: 20px;"><strong>{summary_line}</strong></p>
         <table id="sortable-table">
@@ -164,7 +164,7 @@ def main(json_file_path):
     formatted_html_created_at = format_date(datetime.now().isoformat())
     report_title = (f"Trivy Report - {formatted_html_created_at}")
     # Genera il report HTML
-    html_report = generate_html_report(vulnerabilities, report_title, results_type,css_directory, js_directory, json_created_at)
+    html_report = generate_html_report(vulnerabilities, report_title, results_type,css_directory, js_directory, formatted_json_created_at)
     
     # Scrivi il report HTML sul file di output
     with open(output_html_path, 'w') as file:
