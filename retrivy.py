@@ -120,52 +120,52 @@ def generate_html_report(vulnerabilities, report_title, results_type,css_directo
 
 
 def read_json_input(file_path):
-    # Funzione per leggere il file JSON e restituire i dati delle vulnerabilità
     with open(file_path, 'r') as file:
         data = json.load(file)
-    vulnerabilities = data['Results'][0]['Vulnerabilities']
-    results_type = data["Results"][0]["Type"]
-    json_created_at = data['CreatedAt']
-    return vulnerabilities, results_type, json_created_at
+    
+    results_list = []
+    for result in data['Results']:
+        vulnerabilities = result['Vulnerabilities']
+        results_type = result['Type']
+        try:
+            json_created_at = data['CreatedAt']
+        except KeyError:
+            print("Attenzione: 'CreatedAt' non presente nel file JSON.")
+            json_created_at = None
+        results_list.append((vulnerabilities, results_type, json_created_at))
+    
+    return results_list
 
 def read_json_input(file_path):
-    # Funzione per leggere il file JSON e restituire i dati delle vulnerabilità
     with open(file_path, 'r') as file:
         data = json.load(file)
     
-    # Estrai i dati delle vulnerabilità
-    vulnerabilities = data['Results'][0]['Vulnerabilities']
-    results_type = data["Results"][0]["Type"]
+    json_created_at = data.get('CreatedAt', None)
+    results_list = []
+    for result in data['Results']:
+        vulnerabilities = result.get('Vulnerabilities', [])
+        results_type = result.get('Type', 'Unknown')
+        results_list.append((vulnerabilities, results_type, json_created_at))
     
-    # Gestisci il caso in cui 'CreatedAt' non sia presente nel dizionario
-    try:
-        json_created_at = data['CreatedAt']
-    except KeyError:
-        print("Attenzione: 'CreatedAt' non presente nel file JSON.")
-        json_created_at = None
-    
-    return vulnerabilities, results_type, json_created_at
+    return results_list
+
 
 
 def main(json_file_path):
-    # Leggi le vulnerabilità dal file JSON
-    vulnerabilities, results_type, json_created_at = read_json_input(json_file_path)
+    results_list = read_json_input(json_file_path)
     
-    # Ottieni la data e l'ora correnti nel formato desiderato per il nome del file
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    output_html_filename = f"trivy_report_{timestamp}.html"
-    output_html_path = f"./{output_html_filename}"  # Salva il file nella directory corrente
-    
-    formatted_json_created_at = format_date(json_created_at)
-    formatted_html_created_at = format_date(datetime.now().isoformat())
-    report_title = (f"Trivy Report - {formatted_html_created_at}")
-    # Genera il report HTML
-    html_report = generate_html_report(vulnerabilities, report_title, results_type,css_directory, js_directory, formatted_json_created_at)
-    
-    # Scrivi il report HTML sul file di output
-    with open(output_html_path, 'w') as file:
-        file.write(html_report)
-    print(f"Report saved to {output_html_path}")
+    for index, (vulnerabilities, results_type, json_created_at) in enumerate(results_list):
+        formatted_json_created_at = format_date(json_created_at)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        report_title = f"Trivy Report - {formatted_json_created_at} - {index+1}"
+        output_html_filename = f"trivy_report_{timestamp}_{index+1}.html"
+        output_html_path = f"./{output_html_filename}"
+        
+        html_report = generate_html_report(vulnerabilities, report_title, results_type, css_directory, js_directory, formatted_json_created_at)
+        
+        with open(output_html_path, 'w') as file:
+            file.write(html_report)
+        print(f"Report saved to {output_html_path}")
 
 # Percorsi dei file e directory
 css_directory = 'css/'

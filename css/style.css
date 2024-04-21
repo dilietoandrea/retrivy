@@ -31,6 +31,12 @@ table, th, td {
     padding: .3em;
 }
 
+table#sortable-table td:nth-child(5) {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 150px;
+}
+
 table {
     margin: 0 auto;
 }
