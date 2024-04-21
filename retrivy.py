@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 def format_date(iso_string):
     try:
+        print("try")
         # Tentativo di convertire direttamente la stringa ISO in datetime
         if iso_string.endswith('Z'):
             # Rimuovi 'Z' dalla fine della stringa
@@ -13,6 +14,7 @@ def format_date(iso_string):
         
         date_time = datetime.fromisoformat(clean_iso_string)
     except ValueError:
+        print("except")
         # Se il primo tentativo fallisce, tratta i microsecondi in eccesso
         if '.' in iso_string:
             parts = iso_string.split('.')
@@ -33,10 +35,16 @@ def format_date(iso_string):
     return formatted_date_time
 
 def load_js_file(js_file_path):
+    #Legge il contenuto di un file js e lo restituisce come stringa.
     with open(js_file_path, 'r') as file:
         return file.read()
+    
+def load_css_file(css_file_path):
+    #Legge il contenuto di un file CSS e lo restituisce come stringa.
+    with open(css_file_path, 'r') as file:
+        return file.read()
 
-def generate_html_report(vulnerabilities, report_title, results_type, js_directory, json_created_at):
+def generate_html_report(vulnerabilities, report_title, results_type,css_directory, js_directory, json_created_at):
     # Calcolo del riepilogo
     severity_counts = {'UNKNOWN': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0, 'CRITICAL': 0}
     for v in vulnerabilities:
@@ -45,6 +53,9 @@ def generate_html_report(vulnerabilities, report_title, results_type, js_directo
     
     total_vulnerabilities = sum(severity_counts.values())
     summary_line = f"Total vulnerabilities: {total_vulnerabilities} (UNKNOWN: {severity_counts['UNKNOWN']}, LOW: {severity_counts['LOW']}, MEDIUM: {severity_counts['MEDIUM']}, HIGH: {severity_counts['HIGH']}, CRITICAL: {severity_counts['CRITICAL']})"
+
+    # Carica il CSS
+    css_code = load_css_file(os.path.join(css_directory, 'style.css'))    
 
     # Carica specifici file JavaScript
     sortable_js_code = load_js_file(os.path.join(js_directory, 'sortable.js'))
@@ -81,69 +92,10 @@ def generate_html_report(vulnerabilities, report_title, results_type, js_directo
         <title>{report_title}</title>
         <script>{toggleReferences_js_code}</script>
         <script>{sortable_js_code}</script>
-        <script src="sortable.js"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <style>
-            * {{
-                font-family: Arial, Helvetica, sans-serif;
-            }}
-            h1, h2 {{
-                text-align: center;
-            }}
-            .group-header th {{
-                font-size: 200%;
-            }}
-            .sub-header th {{
-                font-size: 150%;
-            }}
-            table, th, td {{
-                border: 1px solid black;
-                border-collapse: collapse;
-                white-space: nowrap;
-                padding: .3em;
-            }}
-            table {{
-                margin: 0 auto;
-            }}
-            .centered {{
-                text-align: center; /* Allinea centralmente il contenuto della cella */
-            }}
-            .severity {{
-                text-align: center;
-                font-weight: bold;
-                color: #fafafa;
-            }}
-            .severity-LOW .severity {{ background-color: #5fbb31; }}
-            .severity-MEDIUM .severity {{ background-color: #e9c600; }}
-            .severity-HIGH .severity {{ background-color: #ff8800; }}
-            .severity-CRITICAL .severity {{ background-color: #e40000; }}
-            .severity-UNKNOWN .severity {{ background-color: #747474; }}
-            .severity-LOW {{ background-color: #5fbb3160; }}
-            .severity-MEDIUM {{ background-color: #e9c60060; }}
-            .severity-HIGH {{ background-color: #ff880060; }}
-            .severity-CRITICAL {{ background-color: #e4000060; }}
-            .severity-UNKNOWN {{ background-color: #74747460; }}
-            table tr td:first-of-type {{
-                font-weight: bold;
-            }}
-            a {{
-                color: #0000EE;
-                text-decoration: none;
-            }}
-            a:hover {{
-                text-decoration: underline;
-            }}
-            th {{
-                cursor: pointer; /* Cambia il cursore in un puntatore */
-            }}
-            th:hover {{
-                background-color: #f2f2f2; /* Cambia lo sfondo al passaggio del mouse per maggior feedback */
-            }}
-            .sort-icon {{
-                display: inline-block;
-                margin-left: 5px;
-            }}
-        </style>
+        
+        <style>{css_code}</style>
+        
     </head>
     <body>
         <h1>{report_title}</h1>
@@ -168,20 +120,17 @@ def generate_html_report(vulnerabilities, report_title, results_type, js_directo
     </body>
     </html>
     """
-    
     return html_report
 
-"""
-def read_json_input(file_path):
-  # Funzione per leggere il file JSON e restituire i dati delle vulnerabilità
-  with open(file_path, 'r') as file:
-      data = json.load(file)
-  vulnerabilities = data['Results'][0]['Vulnerabilities']
-  results_type = data["Results"][0]["Type"]
-  json_created_at = data['CreatedAt']
-  return vulnerabilities, results_type, json_created_at
-"""
 
+def read_json_input(file_path):
+    # Funzione per leggere il file JSON e restituire i dati delle vulnerabilità
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    vulnerabilities = data['Results'][0]['Vulnerabilities']
+    results_type = data["Results"][0]["Type"]
+    json_created_at = data['CreatedAt']
+    return vulnerabilities, results_type, json_created_at
 
 def read_json_input(file_path):
     # Funzione per leggere il file JSON e restituire i dati delle vulnerabilità
@@ -215,7 +164,7 @@ def main(json_file_path):
     formatted_html_created_at = format_date(datetime.now().isoformat())
     report_title = (f"Trivy Report - {formatted_html_created_at}")
     # Genera il report HTML
-    html_report = generate_html_report(vulnerabilities, report_title, results_type, js_directory, formatted_json_created_at)
+    html_report = generate_html_report(vulnerabilities, report_title, results_type,css_directory, js_directory, json_created_at)
     
     # Scrivi il report HTML sul file di output
     with open(output_html_path, 'w') as file:
@@ -223,6 +172,7 @@ def main(json_file_path):
     print(f"Report saved to {output_html_path}")
 
 # Percorsi dei file e directory
+css_directory = 'css/'
 js_directory = 'js/'
 json_file_path = 'results.json'
 #output_html_path = 'report.html'

@@ -1,0 +1,97 @@
+:root {
+    --severity-low-color: #5fbb3160;
+    --severity-medium-color: #e9c60060;
+    --severity-high-color: #ff880060; 
+    --severity-critical-color: #e4000060;
+    --severity-unknown-color: #74747460;
+    --link-color: #0000EE;
+    --link-hover-color: #0056b3;
+}
+
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+.group-header th {
+    font-size: 200%;
+}
+
+.sub-header th {
+    font-size: 150%;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    white-space: nowrap;
+    padding: .3em;
+}
+
+table {
+    margin: 0 auto;
+}
+
+.centered {
+    text-align: center; /* Allinea centralmente il contenuto della cella */
+}
+
+.severity {
+    text-align: center;
+    font-weight: bold;
+    color: #fafafa;
+}
+
+.severity-LOW .severity { background-color: #5fbb31; }
+.severity-MEDIUM .severity { background-color: #e9c600; }
+.severity-HIGH .severity { background-color: #ff8800; }
+.severity-CRITICAL .severity { background-color: #e40000; }
+.severity-UNKNOWN .severity { background-color: #747474; }
+
+.severity-LOW { background-color: var(--severity-low-color); }
+.severity-MEDIUM { background-color: var(--severity-medium-color); }
+.severity-HIGH { background-color: var(--severity-high-color); }
+.severity-CRITICAL { background-color: var(--severity-critical-color); }
+.severity-UNKNOWN { background-color: var(--severity-unknown-color); }
+
+table tr td:first-of-type {
+    font-weight: bold;
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+th {
+    cursor: pointer; /* Cambia il cursore in un puntatore */
+}
+
+th:hover {
+    background-color: #f2f2f2; /* Cambia lo sfondo al passaggio del mouse per maggior feedback */
+}
+
+.sort-icon {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+    .group-header th, .sub-header th {
+        font-size: 120%; /* Riduzione della dimensione per schermi piccoli */
+    }
+
+    table {
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+    }
+}
