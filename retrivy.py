@@ -99,7 +99,7 @@ def generate_html_report(vulnerabilities, report_title, results_type,css_directo
     </head>
     <body>
         <h1>{report_title}</h1>
-        <h2>json generated on {formatted_json_created_at}</h2>
+        <h2>JSON generated on {formatted_json_created_at}</h2>
         <h2>Type: {results_type}</h2>
         <p style="text-align: center; font-size: 20px;"><strong>{summary_line}</strong></p>
         <table id="sortable-table">
