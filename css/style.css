@@ -12,7 +12,7 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-h1, h2 {
+h1, h2, p {
     text-align: center;
 }
 
@@ -57,13 +57,14 @@ table {
 .severity-CRITICAL { background-color: var(--severity-critical-color); }
 .severity-UNKNOWN { background-color: var(--severity-unknown-color); }
 
-table tr td:first-of-type {
-    font-weight: bold;
-}
 
+table tr td:first-of-type {
+	font-weight: bold;
+}
+/* Stili per i link */
 a {
     color: var(--link-color);
-    text-decoration: none;
+    text-decoration: block;
 }
 
 a:hover {
@@ -94,4 +95,44 @@ th:hover {
         display: block;
         overflow-x: auto;
     }
+}
+
+/* Stili per la tabella */
+#sortable-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Stili per le righe della tabella */
+#sortable-table tr {
+    border-bottom: 1px solid #ddd;
+}
+
+/* Stili per le celle della tabella */
+#sortable-table td, #sortable-table th {
+    padding: 8px;
+}
+
+/* Stili per l'elemento div che mostra/nasconde i riferimenti */
+.references {
+    display: none;
+}
+
+/* Stili per l'elemento <strong> */
+strong {
+    font-weight: bold;
+}
+
+/* Stili per l'elemento <div> che mostra/nasconde i riferimenti quando si fa clic */
+.references:target {
+    display: block;
+}
+.show-references {
+    color: var(--link-color); /* Usa il colore predefinito dei link */
+    text-decoration: underline;
+    cursor: pointer; /* Mostra il cursore come un puntatore */
+}
+
+.show-references:hover {
+    color: var(--link-hover-color); /* Cambia il colore al passaggio del mouse */
 }

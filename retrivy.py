@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 
 def format_date(iso_string):
     try:
-        print("try")
         # Tentativo di convertire direttamente la stringa ISO in datetime
         if iso_string.endswith('Z'):
             # Rimuovi 'Z' dalla fine della stringa
@@ -14,7 +13,6 @@ def format_date(iso_string):
         
         date_time = datetime.fromisoformat(clean_iso_string)
     except ValueError:
-        print("except")
         # Se il primo tentativo fallisce, tratta i microsecondi in eccesso
         if '.' in iso_string:
             parts = iso_string.split('.')
@@ -73,7 +71,7 @@ def generate_html_report(vulnerabilities, report_title, results_type,css_directo
             <td>
                 <strong>{v['Title']}</strong><br>
                 <a href="{v['PrimaryURL']}">{v['PrimaryURL']}</a>
-                <div onclick="toggleReferences(this)" style="cursor: pointer; color: blue; text-decoration: underline;">
+                <div onclick="toggleReferences(this)" class="show-references" style="cursor: pointer; text-decoration: underline;">
                     Show References
                 </div>
                 <div class="references" style="display: none;">
@@ -89,19 +87,15 @@ def generate_html_report(vulnerabilities, report_title, results_type,css_directo
     <!DOCTYPE html>
     <html>
     <head>
-        <title>{report_title}</title>
-        <script>{toggleReferences_js_code}</script>
-        <script>{sortable_js_code}</script>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        
         <style>{css_code}</style>
-        
+        <title>{report_title}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     </head>
     <body>
         <h1>{report_title}</h1>
-        <h2>JSON generated on {formatted_json_created_at}</h2>
-        <h2>Type: {results_type}</h2>
-        <p style="text-align: center; font-size: 20px;"><strong>{summary_line}</strong></p>
+        <p><strong>JSON generated on {formatted_json_created_at}</strong></p>
+        <p><strong>Type: {results_type}</strong></p>
+        <p><strong>{summary_line}</strong></p>
         <table id="sortable-table">
             <thead>
                 <tr class="sub-header">
@@ -117,6 +111,8 @@ def generate_html_report(vulnerabilities, report_title, results_type,css_directo
                 {rows}
             </tbody>
         </table>
+        <script>{toggleReferences_js_code}</script>
+        <script>{sortable_js_code}</script>
     </body>
     </html>
     """
