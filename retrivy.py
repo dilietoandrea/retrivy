@@ -2,14 +2,30 @@ import json
 import os
 from datetime import datetime, timezone
 
-def validate_directories(*directories):
+def validate_directories(*directories: str) -> bool:
+    """Verifica che tutte le directory esistano.
+
+    Args:
+        *directories (str): Lista di percorsi di directory da verificare.
+
+    Returns:
+        bool: True se tutte le directory esistono, False altrimenti.
+    """
     for directory in directories:
         if not os.path.isdir(directory):
             print(f"Attenzione: la directory '{directory}' non esiste.")
             return False
     return True
+
+def load_file(file_path: str) -> str:
+    """Legge il contenuto di un file e lo restituisce come stringa.
     
-def load_file(file_path):
+    Args:
+        file_path (str): Il percorso del file da leggere.
+        
+    Returns:
+        str: Il contenuto del file come stringa, o una stringa vuota se non è possibile leggere il file.
+    """
     try:
         with open(file_path, 'r') as file:
             return file.read()
@@ -18,39 +34,34 @@ def load_file(file_path):
     except PermissionError:
         print(f"Errore: Permesso negato per leggere il file '{file_path}'.")
     return ""
-    
+        
 def format_date(iso_string: str) -> str:
-    #Formatta una stringa ISO in un formato leggibile. Restituisce un messaggio di errore se la formattazione fallisce.
+    """Formatta una stringa ISO in un formato leggibile.
+    
+    Args:
+        iso_string (str): Stringa della data in formato ISO.
+
+    Returns:
+        str: Data formattata in "%Y-%m-%d %H:%M:%S %z" o un messaggio di errore.
+    """
     if not iso_string:
         return "Formato data non valido"
+    
     try:
-        # Rimuove il suffisso 'Z' se presente, per evitare problemi di parsing
-        clean_iso_string = iso_string.rstrip('Z')
-        
-        # Tenta di creare il datetime ignorando i microsecondi in eccesso
-        if '.' in clean_iso_string:
-            parts = clean_iso_string.split('.')
-            seconds = parts[0]
-            microseconds = parts[1][:6]  # Limita i microsecondi a 6 cifre
-            clean_iso_string = f"{seconds}.{microseconds}"
-        
-        # Converti la stringa in un oggetto datetime
-        date_time = datetime.fromisoformat(clean_iso_string)
-        
-        # Aggiungi il fuso orario UTC se la stringa originale terminava con 'Z'
-        if iso_string.endswith('Z'):
-            date_time = date_time.replace(tzinfo=timezone.utc)
+        # Usa datetime.fromisoformat direttamente, che gestisce automaticamente fusi orari e microsecondi
+        date_time = datetime.fromisoformat(iso_string)
         
         # Formatta la data e l'ora nel formato desiderato
-        formatted_date_time = date_time.strftime("%Y-%m-%d %H:%M:%S %z")
+        #formatted_date_time = date_time.strftime("%Y-%m-%d %H:%M:%S %z")
+        formatted_date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
         return formatted_date_time
 
     except ValueError:
-        # Se non riesce a formattare, restituisci un messaggio di errore o un valore predefinito
         print("Errore: il formato della stringa ISO non è valido.")
         return "Formato data non valido"
-        
+
 def generate_table_rows(vulnerabilities):
+    """Genera le righe HTML per la tabella delle vulnerabilità."""
     return "".join([
         f"""
         <tr class="severity-{v['Severity']}">
@@ -74,8 +85,8 @@ def generate_table_rows(vulnerabilities):
         for v in vulnerabilities
     ])
 
-def generate_html_report(vulnerabilities, report_title, results_target, results_type,css_directory, js_directory, formatted_json_created_at):
-    # Calcolo del riepilogo
+def generate_html_report(vulnerabilities, report_title, results_target, results_type, css_directory, js_directory, formatted_json_created_at):
+    """Genera il contenuto HTML per il report delle vulnerabilità."""
     severity_counts = {'UNKNOWN': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0, 'CRITICAL': 0}
     for v in vulnerabilities:
         if v['Severity'] in severity_counts:
@@ -84,14 +95,10 @@ def generate_html_report(vulnerabilities, report_title, results_target, results_
     total_vulnerabilities = sum(severity_counts.values())
     summary_line = f"Total vulnerabilities: {total_vulnerabilities} (UNKNOWN: {severity_counts['UNKNOWN']}, LOW: {severity_counts['LOW']}, MEDIUM: {severity_counts['MEDIUM']}, HIGH: {severity_counts['HIGH']}, CRITICAL: {severity_counts['CRITICAL']})"
 
-    # Carica il CSS
-    css_code = load_file(os.path.join(css_directory, 'style.css'))    
-
-    # Carica specifici file JavaScript
+    css_code = load_file(os.path.join(css_directory, 'style.css'))
     sortable_js_code = load_file(os.path.join(js_directory, 'sortable.js'))
     toggleReferences_js_code = load_file(os.path.join(js_directory, 'toggleReferences.js'))
 
-    # Generazione delle righe della tabella
     rows = generate_table_rows(vulnerabilities)
     
     html_report = f"""
@@ -129,8 +136,8 @@ def generate_html_report(vulnerabilities, report_title, results_target, results_
     """
     return html_report
 
-
-def read_json_input(file_path):
+def read_json_input(file_path: str):
+    """Legge un file JSON di input e restituisce una lista di risultati di vulnerabilità."""
     with open(file_path, 'r') as file:
         data = json.load(file)
     
@@ -144,7 +151,8 @@ def read_json_input(file_path):
     
     return results_list
 
-def main(json_file_path, css_directory, js_directory):
+def main(json_file_path: str, css_directory: str, js_directory: str):
+    """Esegue la generazione del report HTML."""
     results_list = read_json_input(json_file_path)
     
     for index, (vulnerabilities, results_target, results_type, json_created_at) in enumerate(results_list):
@@ -164,7 +172,6 @@ def main(json_file_path, css_directory, js_directory):
 css_directory = 'css/'
 js_directory = 'js/'
 json_file_path = 'results.json'
-#output_html_path = 'report.html'
 
 # Esegue lo script principale
 if __name__ == "__main__":
