@@ -49,17 +49,6 @@ def format_date(iso_string: str) -> str:
         # Se non riesce a formattare, restituisci un messaggio di errore o un valore predefinito
         print("Errore: il formato della stringa ISO non è valido.")
         return "Formato data non valido"
-
-
-def load_js_file(js_file_path):
-    #Legge il contenuto di un file js e lo restituisce come stringa.
-    with open(js_file_path, 'r') as file:
-        return file.read()
-    
-def load_css_file(css_file_path):
-    #Legge il contenuto di un file CSS e lo restituisce come stringa.
-    with open(css_file_path, 'r') as file:
-        return file.read()
         
 def generate_table_rows(vulnerabilities):
     return "".join([
@@ -96,11 +85,11 @@ def generate_html_report(vulnerabilities, report_title, results_target, results_
     summary_line = f"Total vulnerabilities: {total_vulnerabilities} (UNKNOWN: {severity_counts['UNKNOWN']}, LOW: {severity_counts['LOW']}, MEDIUM: {severity_counts['MEDIUM']}, HIGH: {severity_counts['HIGH']}, CRITICAL: {severity_counts['CRITICAL']})"
 
     # Carica il CSS
-    css_code = load_css_file(os.path.join(css_directory, 'style.css'))    
+    css_code = load_file(os.path.join(css_directory, 'style.css'))    
 
     # Carica specifici file JavaScript
-    sortable_js_code = load_js_file(os.path.join(js_directory, 'sortable.js'))
-    toggleReferences_js_code = load_js_file(os.path.join(js_directory, 'toggleReferences.js'))
+    sortable_js_code = load_file(os.path.join(js_directory, 'sortable.js'))
+    toggleReferences_js_code = load_file(os.path.join(js_directory, 'toggleReferences.js'))
 
     # Generazione delle righe della tabella
     rows = generate_table_rows(vulnerabilities)
