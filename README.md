@@ -13,7 +13,7 @@ Tool per generare report di vulnerabilità utilizzando il risultato di una scans
   	Con questo comando trivy cercherà nella cartella corrente i file di gestione delle dipendenze (requirements.txt, composer.lock, ...) riportando le vulnerabilità individuate nel file results.json
 
     L'elenco dei file individuabili nel filesystem scanning è disponibilie nella documentazione ufficiale di trivy:
-    https://aquasecurity.github.io/trivy/v0.50/docs/coverage/language/
+    https://trivy.dev/latest/docs/coverage/language/
 
 ## OUTPUT
 
