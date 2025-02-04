@@ -76,7 +76,8 @@ def generate_table_rows(vulnerabilities):
             <td>{v['VulnerabilityID']}</td>
             <td class="severity">{v['Severity']}</td>
             <td class="centered">{v['InstalledVersion']}</td>
-            <td class="centered">{v['FixedVersion']}</td>
+            <td class="centered">{v.get('FixedVersion', 'N/A')}</td>
+
             <td>
                 <strong>{v['Title']}</strong><br>
                 <a href="{v['PrimaryURL']}">{v['PrimaryURL']}</a>
@@ -156,20 +157,20 @@ def generate_html_report(vulnerabilities, report_title, results_target, results_
 </html>
     """
     return html_report
-
+    
 def read_json_input(file_path: str):
     """
-    Legge un file JSON di input ed estrae i risultati delle vulnerabilità.
+    Reads a JSON input file and extracts vulnerability results.
 
     Args:
-        file_path (str): Percorso del file JSON.
+        file_path (str): Path to the JSON file.
 
     Returns:
-        list: Lista di tuple, ciascuna contenente dati delle vulnerabilità, target, tipo e data di creazione.
+        list: List of tuples containing vulnerability data, target, type, and creation date.
     """
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:  # Specify UTF-8 encoding
         data = json.load(file)
-    
+
     json_created_at = data.get('CreatedAt', None)
     results_list = []
     for result in data['Results']:
@@ -177,32 +178,139 @@ def read_json_input(file_path: str):
         results_target = result.get('Target', 'Unknown')
         results_type = result.get('Type', 'Unknown')
         results_list.append((vulnerabilities, results_target, results_type, json_created_at))
-    
+
     return results_list
 
 def main(json_file_path: str, css_directory: str, js_directory: str):
     """
-    Esegue il processo di generazione del report HTML.
-
-    Args:
-        json_file_path (str): Percorso del file JSON contenente i dati delle vulnerabilità.
-        css_directory (str): Directory dei file CSS.
-        js_directory (str): Directory dei file JavaScript.
+    Esegue il processo di generazione di un unico report HTML con tutte le vulnerabilità.
     """
     results_list = read_json_input(json_file_path)
-    
-    for index, (vulnerabilities, results_target, results_type, json_created_at) in enumerate(results_list):
-        formatted_json_created_at = format_date(json_created_at)
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        report_title = f"Trivy Report - {formatted_json_created_at} - {index+1}"
-        output_html_filename = f"trivy_report_{timestamp}_{index+1}.html"
-        output_html_path = f"./{output_html_filename}"
-        
-        html_report = generate_html_report(vulnerabilities, report_title, results_target, results_type, css_directory, js_directory, formatted_json_created_at)
-        
-        with open(output_html_path, 'w') as file:
-            file.write(html_report)
-        logging.info(f"Report saved to {output_html_path}")
+
+    all_vulnerabilities = []
+    all_targets = []
+    all_types = []
+    json_created_at = None
+
+    # Combina tutti i risultati in un unico insieme
+    for vulnerabilities, results_target, results_type, created_at in results_list:
+        all_vulnerabilities.extend(vulnerabilities)
+        all_targets.append(results_target)
+        all_types.append(results_type)
+        json_created_at = created_at or json_created_at
+
+    formatted_json_created_at = format_date(json_created_at)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    report_title = f"Trivy Report - {formatted_json_created_at}"
+    output_html_filename = f"trivy_combined_report_{timestamp}.html"
+    output_html_path = f"./{output_html_filename}"
+
+    html_report = generate_html_report(
+        all_vulnerabilities,
+        report_title,
+        ", ".join(set(all_targets)),  # Unisce i target unici
+        ", ".join(set(all_types)),    # Unisce i tipi unici
+        css_directory,
+        js_directory,
+        formatted_json_created_at
+    )
+
+    with open(output_html_path, 'w') as file:
+        file.write(html_report)
+    logging.info(f"Unico report salvato in {output_html_path}")
+
+def main(json_file_path: str, css_directory: str, js_directory: str):
+    """
+    Esegue il processo di generazione di un unico report HTML con separazione per target.
+    """
+    results_list = read_json_input(json_file_path)
+
+    sections = []
+    json_created_at = None
+
+    for index, (vulnerabilities, results_target, results_type, created_at) in enumerate(results_list):
+        json_created_at = created_at or json_created_at
+        section_html = generate_html_section(
+            vulnerabilities,
+            results_target,
+            results_type,
+            index
+        )
+        sections.append(section_html)
+
+    formatted_json_created_at = format_date(json_created_at)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    report_title = f"Trivy Report - {formatted_json_created_at}"
+    output_html_filename = f"trivy_report_{timestamp}.html"
+    output_html_path = f"./{output_html_filename}"
+
+    full_html_report = generate_full_html_report(
+        sections,
+        report_title,
+        css_directory,
+        js_directory,
+        formatted_json_created_at
+    )
+
+    with open(output_html_path, 'w') as file:
+        file.write(full_html_report)
+    logging.info(f"Unico report separato per target salvato in {output_html_path}")
+
+def generate_html_section(vulnerabilities, target, analysis_type, table_index):
+    """
+    Genera una sezione HTML per un target specifico.
+    """
+    rows = generate_table_rows(vulnerabilities)
+    table_id = f"sortable-table-{table_index}"  # ID univoco per ogni tabella
+    return f"""
+    <section>
+        <h2>Target: {target} (Type: {analysis_type})</h2>
+        <table id="{table_id}">
+            <thead>
+                <tr class="sub-header">
+                    <th onclick="sortTable('{table_id}', 0)">Package<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 1)">Vulnerability ID<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 2)">Severity<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 3)">Version<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 4)">Fixed Version<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 5)">Links<span class='sort-icon'></span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows}
+            </tbody>
+        </table>
+    </section>
+    """
+
+def generate_full_html_report(sections, report_title, css_directory, js_directory, formatted_json_created_at):
+    """
+    Genera l'intero report HTML includendo tutte le sezioni.
+    """
+    css_code = load_file(os.path.join(css_directory, 'style.css'))
+    sortable_js_code = load_file(os.path.join(js_directory, 'sortable.js'))
+    toggleReferences_js_code = load_file(os.path.join(js_directory, 'toggleReferences.js'))
+
+    sections_html = "".join(sections)
+
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>{css_code}</style>
+        <title>{report_title}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    </head>
+    <body>
+        <h1>{report_title}</h1>
+        <p><strong>JSON generated on {formatted_json_created_at}</strong></p>
+        {sections_html}
+        <script>{toggleReferences_js_code}</script>
+        <script>{sortable_js_code}</script>
+    </body>
+    </html>
+    """
+
 
 # Percorsi dei file e directory richiesti
 if __name__ == "__main__":
