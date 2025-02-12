@@ -65,3 +65,143 @@ function sortTable(columnIndex) {
         }
     });
 }
+function sortTable(columnIndex) {
+    var table = document.getElementById("sortable-table");
+    var rows = Array.from(table.rows).slice(1); // Escludi l'header
+
+    // Determina la direzione dell'ordinamento
+    var dir = currentSort.columnIndex === columnIndex && currentSort.direction === 'asc' ? 'desc' : 'asc';
+    currentSort = { columnIndex, direction: dir };
+
+    // Mappa di ordinamento per la severità
+    const severityOrder = { 'UNKNOWN': 1, 'LOW': 2, 'MEDIUM': 3, 'HIGH': 4, 'CRITICAL': 5 };
+
+    rows.sort((rowA, rowB) => {
+        let cellA = rowA.cells[columnIndex].textContent.trim();
+        let cellB = rowB.cells[columnIndex].textContent.trim();
+
+        let comparison = 0;
+
+        // 🔹 Ordinamento speciale per la colonna "Severity" (indice 2)
+        if (columnIndex === 2) {
+            comparison = (severityOrder[cellA] || 0) - (severityOrder[cellB] || 0);
+        }
+        // 🔹 Ordinamento numerico (se entrambi i valori sono numeri)
+        else if (!isNaN(cellA) && !isNaN(cellB)) {
+            comparison = parseFloat(cellA) - parseFloat(cellB);
+        }
+        // 🔹 Ordinamento alfabetico standard
+        else {
+            comparison = cellA.localeCompare(cellB);
+        }
+
+        return dir === 'asc' ? comparison : -comparison;
+    });
+
+    // 🔹 Aggiorna la tabella con le righe ordinate
+    rows.forEach(row => table.appendChild(row));
+
+    // 🔹 Aggiorna le icone di ordinamento nelle intestazioni
+    document.querySelectorAll('#sortable-table th').forEach((th, index) => {
+        th.innerHTML = th.innerHTML.replace(/▲|▼|$/, index === columnIndex ? (dir === 'asc' ? '▲' : '▼') : '');
+    });
+}
+function sortTable(tableId, columnIndex) {
+    var table = document.getElementById(tableId);
+    if (!table) return; // Se la tabella non esiste, esci
+
+    var rows = Array.from(table.getElementsByTagName("TR")).slice(1); // Escludi l'header
+    var dir = currentSort[tableId]?.columnIndex === columnIndex && currentSort[tableId]?.direction === 'asc' ? 'desc' : 'asc';
+    currentSort[tableId] = { columnIndex, direction: dir };
+
+    // Mappa di ordinamento per la severità
+    const severityOrder = { 'UNKNOWN': 1, 'LOW': 2, 'MEDIUM': 3, 'HIGH': 4, 'CRITICAL': 5 };
+
+    rows.sort((rowA, rowB) => {
+        let cellA = rowA.cells[columnIndex]?.textContent.trim() || "";
+        let cellB = rowB.cells[columnIndex]?.textContent.trim() || "";
+
+        let comparison = 0;
+
+        // 🔹 Ordinamento speciale per la colonna "Severity" (indice 2)
+        if (columnIndex === 2) {
+            comparison = (severityOrder[cellA] || 0) - (severityOrder[cellB] || 0);
+        }
+        // 🔹 Ordinamento numerico (se entrambi i valori sono numeri)
+        else if (!isNaN(cellA) && !isNaN(cellB)) {
+            comparison = parseFloat(cellA) - parseFloat(cellB);
+        }
+        // 🔹 Ordinamento alfabetico standard
+        else {
+            comparison = cellA.localeCompare(cellB);
+        }
+
+        return dir === 'asc' ? comparison : -comparison;
+    });
+
+    // 🔹 Aggiorna la tabella con le righe ordinate
+    rows.forEach(row => table.appendChild(row));
+
+    // 🔹 Aggiorna le icone di ordinamento nelle intestazioni della tabella specifica
+    document.querySelectorAll(`#${tableId} th`).forEach((th, index) => {
+        th.innerHTML = th.innerHTML.replace(/▲|▼|$/, index === columnIndex ? (dir === 'asc' ? '▲' : '▼') : '');
+    });
+}
+// Oggetto per tenere traccia dell'ordinamento di ogni tabella
+var currentSort = {};
+
+// Funzione per ordinare la tabella
+function sortTable(tableId, columnIndex, initialDir = 'asc') {
+    var table = document.getElementById(tableId);
+    if (!table) return;
+
+    var rows = Array.from(table.getElementsByTagName("TR")).slice(1); // Escludi l'header
+    var dir = currentSort[tableId]?.columnIndex === columnIndex && currentSort[tableId]?.direction === 'asc' ? 'desc' : 'asc';
+    
+    // Se la colonna è "Severity" (indice 2), impostala sempre su 'desc' alla prima esecuzione
+    if (!currentSort[tableId] && columnIndex === 2) {
+        dir = 'desc';
+    }
+
+    currentSort[tableId] = { columnIndex, direction: dir };
+
+    // Mappa di ordinamento per la severità
+    const severityOrder = { 'UNKNOWN': 1, 'LOW': 2, 'MEDIUM': 3, 'HIGH': 4, 'CRITICAL': 5 };
+
+    rows.sort((rowA, rowB) => {
+        let cellA = rowA.cells[columnIndex]?.textContent.trim() || "";
+        let cellB = rowB.cells[columnIndex]?.textContent.trim() || "";
+
+        let comparison = 0;
+
+        // Ordinamento speciale per la colonna "Severity" (indice 2)
+        if (columnIndex === 2) {
+            comparison = (severityOrder[cellA] || 0) - (severityOrder[cellB] || 0);
+        }
+        // Ordinamento numerico (se entrambi i valori sono numeri)
+        else if (!isNaN(cellA) && !isNaN(cellB)) {
+            comparison = parseFloat(cellA) - parseFloat(cellB);
+        }
+        // Ordinamento alfabetico standard
+        else {
+            comparison = cellA.localeCompare(cellB);
+        }
+
+        return dir === 'asc' ? comparison : -comparison;
+    });
+
+    // Aggiorna la tabella con le righe ordinate
+    rows.forEach(row => table.appendChild(row));
+
+    // Aggiorna le icone di ordinamento nelle intestazioni della tabella specifica
+    document.querySelectorAll(`#${tableId} th`).forEach((th, index) => {
+        th.innerHTML = th.innerHTML.replace(/▲|▼|$/, index === columnIndex ? (dir === 'asc' ? '▲' : '▼') : '');
+    });
+}
+
+// Quando la pagina è caricata, ordina automaticamente la colonna "Severity" (indice 2)
+window.onload = function() {
+    document.querySelectorAll("table[id^='sortable-table']").forEach((table) => {
+        sortTable(table.id, 2, 'desc'); // Ordina automaticamente la colonna "Severity" in modo decrescente
+    });
+};
