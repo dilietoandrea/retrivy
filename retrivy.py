@@ -283,6 +283,44 @@ def generate_html_section(vulnerabilities, target, analysis_type, table_index):
     </section>
     """
 
+def generate_html_section(vulnerabilities, target, analysis_type, table_index):
+    """
+    Genera una sezione HTML per un target specifico.
+
+    Args:
+        vulnerabilities (list): Lista delle vulnerabilità da includere nella tabella.
+        target (str): Nome del target analizzato.
+        analysis_type (str): Tipo di analisi eseguita.
+        table_index (int): Indice univoco della tabella per garantire un ID univoco.
+
+    Returns:
+        str: Stringa HTML della sezione.
+    """
+    rows = generate_table_rows(vulnerabilities)
+    table_id = f"sortable-table-{table_index}"  # ID univoco per ogni tabella
+
+    return f"""
+    <section>
+        <h2>Target: {target} (Type: {analysis_type})</h2>
+        <table id="{table_id}" class="sortable-table">
+            <thead>
+                <tr class="sub-header">
+                    <th onclick="sortTable('{table_id}', 0)">Package<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 1)">Vulnerability ID<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 2)">Severity<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 3)">Version<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 4)">Fixed Version<span class='sort-icon'></span></th>
+                    <th onclick="sortTable('{table_id}', 5)">Links<span class='sort-icon'></span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows if rows else '<tr><td colspan="6" class="centered">No vulnerabilities found</td></tr>'}
+            </tbody>
+        </table>
+    </section>
+    """
+
+
 def generate_full_html_report(sections, report_title, css_directory, js_directory, formatted_json_created_at):
     """
     Genera l'intero report HTML includendo tutte le sezioni.
