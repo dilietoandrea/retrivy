@@ -1,7 +1,14 @@
 
 # RETRIVY
 
-Tool per generare report di vulnerabilità utilizzando il risultato di una scansione con [trivy](https://trivy.dev)
+Tool per generare report di vulnerabilità utilizzando il risultato di una scansione con trivy o grype.
+
+## SUPPORTED SCANNERS
+
+- **[Trivy](https://trivy.dev)**
+- **[Grype](https://github.com/anchore/grype)**
+
+
 ## INPUT
 
 `results.json`
@@ -10,10 +17,20 @@ Tool per generare report di vulnerabilità utilizzando il risultato di una scans
     ```bash
     trivy fs --scanners vuln --format json -o results.json .
     ```
-  	Con questo comando trivy cercherà nella cartella corrente i file di gestione delle dipendenze (requirements.txt, composer.lock, ...) riportando le vulnerabilità individuate nel file results.json
+	
+	oppure
+	
+	```bash
+	grype . -o json > results_grype.json
+	```
+  	Con questo comando trivy (o grype) cercherà nella cartella corrente i file di gestione delle dipendenze (requirements.txt, composer.lock, ...) riportando le vulnerabilità individuate nel file results.json
 
-    L'elenco dei file individuabili nel filesystem scanning è disponibilie nella documentazione ufficiale di trivy:
+    L'elenco dei file individuabili nel filesystem scanning è disponibilie nella documentazione ufficiale
+	trivy:
     https://trivy.dev/latest/docs/coverage/language/
+	
+	grye:
+	https://github.com/anchore/grype
 
 ## OUTPUT
 
