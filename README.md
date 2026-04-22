@@ -118,6 +118,34 @@ Per aprire automaticamente il report HTML appena generato:
 python scan.py --scanner trivy --target "input examples/classifica-film-2.8.0" --open
 ```
 
+## Workflow consigliato
+
+Da PowerShell, nella cartella del progetto:
+
+```powershell
+cd C:\Users\andre\Documents\GitHub\retrivy
+```
+
+Aggiorna gli scanner locali all'ultima release disponibile:
+
+```powershell
+python install_tools.py --force
+```
+
+Esegui una scansione Trivy e apri subito il report:
+
+```powershell
+python scan.py --scanner trivy --target "input examples\classifica-film-2.8.0" --open
+```
+
+Per confrontare il risultato con Grype:
+
+```powershell
+python scan.py --scanner grype --target "input examples\classifica-film-2.8.0" --open
+```
+
+I report e i JSON grezzi vengono creati in `reports/`, che e' ignorata da Git. La cartella `input examples/` dovrebbe contenere solo input di esempio o target da scansionare, non output generati.
+
 Uso base, con `results.json` nella root del progetto:
 
 ```bash
