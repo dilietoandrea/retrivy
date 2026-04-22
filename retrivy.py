@@ -330,7 +330,17 @@ def parse_trivy_json(data):
     json_created_at = data.get('CreatedAt', None)
     results_list = []
 
-    for result in data.get('Results', []):
+    results = data.get('Results', [])
+    if not results:
+        results_list.append((
+            [],
+            data.get("ArtifactName", "Unknown Target"),
+            data.get("ArtifactType", "Unknown Type"),
+            json_created_at
+        ))
+        return results_list
+
+    for result in results:
         vulnerabilities = []
 
         for vuln in result.get('Vulnerabilities', []):
@@ -455,7 +465,7 @@ def read_json_input(file_path: str):
             )
 
         # Determina il formato del file JSON e chiama il parser corretto
-        if 'Results' in data:
+        if 'Results' in data or 'Trivy' in data:
             scanner_tool ="Trivy"
             logging.info(f"Formato JSON riconosciuto: {scanner_tool}")
             return parse_trivy_json(data),scanner_tool
