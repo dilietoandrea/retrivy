@@ -95,6 +95,29 @@ def test_parse_grype_json_groups_vulnerabilities_by_location():
     assert vulnerabilities[0]["FixedVersion"] == "42.0.0"
 
 
+def test_parse_grype_json_handles_empty_matches():
+    data = {
+        "matches": [],
+        "source": {
+            "type": "directory",
+            "target": "input examples/classifica-film-2.8.0",
+        },
+        "descriptor": {
+            "name": "grype",
+            "version": "0.111.1",
+            "timestamp": "2026-04-22T22:21:20.8504563+02:00",
+        },
+    }
+
+    results = retrivy.parse_grype_json(data)
+
+    vulnerabilities, target, analysis_type, created_at = results[0]
+    assert vulnerabilities == []
+    assert target == "input examples/classifica-film-2.8.0"
+    assert analysis_type == "directory"
+    assert created_at == "2026-04-22T22:21:20.8504563+02:00"
+
+
 def test_generate_table_rows_escapes_html_and_blocks_unsafe_links():
     rows = retrivy.generate_table_rows([
         {

@@ -370,8 +370,18 @@ def parse_grype_json(data, max_description_length=200):
 
     json_created_at = data.get('descriptor', {}).get('timestamp', None)
     vulnerabilities_by_path = {}
+    matches = data.get('matches', [])
 
-    for match in data.get('matches', []):
+    if not matches:
+        source = data.get('source', {})
+        return [(
+            [],
+            source.get('target', 'Unknown Target'),
+            source.get('type', 'Grype Scan'),
+            json_created_at
+        )]
+
+    for match in matches:
         artifact = match.get('artifact', {})
         locations = artifact.get('locations', [])  # Percorsi in cui è stato trovato il pacchetto
 
