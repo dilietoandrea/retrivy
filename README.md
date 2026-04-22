@@ -1,44 +1,68 @@
-
 # RETRIVY
 
-Tool per generare report di vulnerabilità utilizzando il risultato di una scansione con trivy o grype.
+Tool per generare report HTML di vulnerabilità a partire dal risultato JSON di una scansione con Trivy o Grype.
 
-## SUPPORTED SCANNERS
+## Scanner supportati
 
-- **[Trivy](https://trivy.dev)**
-- **[Grype](https://github.com/anchore/grype)**
+- [Trivy](https://trivy.dev)
+- [Grype](https://github.com/anchore/grype)
 
+## Installazione
 
-## INPUT
+```bash
+pip install -r requirements.txt
+```
 
-`results.json`
-  - File json risultato della scansione con trivy
-  - Comando di scansione:
-    ```bash
-    trivy fs --scanners vuln --format json -o results.json .
-    ```
-	
-	oppure
-	
-	```bash
-	grype . -o json > results_grype.json
-	```
-  	Con questo comando trivy (o grype) cercherà nella cartella corrente i file di gestione delle dipendenze (requirements.txt, composer.lock, ...) riportando le vulnerabilità individuate nel file results.json
+## Input
 
-    L'elenco dei file individuabili nel filesystem scanning è disponibilie nella documentazione ufficiale
-	trivy:
-    https://trivy.dev/latest/docs/coverage/language/
-	
-	grye:
-	https://github.com/anchore/grype
+RETRIVY legge un file JSON prodotto da Trivy o Grype.
 
-## OUTPUT
+Esempio con Trivy:
 
-`File html` 
-  - Report in formato html sulle vulnerabilità individuate in results.json
+```bash
+trivy fs --scanners vuln --format json -o results.json .
+```
 
-## UTILIZZO
+Esempio con Grype:
+
+```bash
+grype . -o json > results_grype.json
+```
+
+Entrambi gli scanner cercano nel filesystem file di gestione delle dipendenze, come `requirements.txt`, `composer.lock` e altri manifest supportati.
+
+Documentazione utile:
+
+- Trivy filesystem/language coverage: <https://trivy.dev/latest/docs/coverage/language/>
+- Grype: <https://github.com/anchore/grype>
+
+## Utilizzo
+
+Uso base, con `results.json` nella root del progetto:
 
 ```bash
 python retrivy.py
 ```
+
+Uso con input e output espliciti:
+
+```bash
+python retrivy.py --input "input examples/results.json" --output report.html
+```
+
+Opzioni disponibili:
+
+```bash
+python retrivy.py --help
+```
+
+## Output
+
+Lo script genera un report HTML con:
+
+- vulnerabilità raggruppate per target
+- conteggio per severità
+- tabella ordinabile
+- link primario e riferimenti espandibili
+
+Se non viene indicato `--output`, il file viene creato con un nome automatico basato su scanner e timestamp.
