@@ -23,6 +23,45 @@ Installazione manuale alternativa:
 pip install -r requirements.txt
 ```
 
+## Installazione scanner
+
+Trivy e Grype non sono librerie Python, quindi vengono installati separatamente nella cartella locale `.tools/`.
+
+Per installare o aggiornare entrambi all'ultima release disponibile su GitHub:
+
+```bash
+python install_tools.py
+```
+
+Per vedere cosa verrebbe installato senza scaricare nulla:
+
+```bash
+python install_tools.py --dry-run
+```
+
+Gli eseguibili vengono salvati in `.tools/bin/`. Su Windows puoi usarli cosi':
+
+```bash
+.\.tools\bin\trivy.exe --version
+.\.tools\bin\grype.exe version
+```
+
+L'installer scarica gli archivi dagli asset ufficiali GitHub della release piu' recente e verifica lo SHA256 usando il file `checksums.txt` pubblicato nella stessa release.
+
+Esempio di scansione con Trivy:
+
+```bash
+.\.tools\bin\trivy.exe fs --scanners vuln --format json -o results.json .
+python run.py --input results.json --output report.html
+```
+
+Esempio di scansione con Grype:
+
+```bash
+.\.tools\bin\grype.exe . -o json > results_grype.json
+python run.py --input results_grype.json --output report.html
+```
+
 ## Input
 
 RETRIVY legge un file JSON prodotto da Trivy o Grype.
