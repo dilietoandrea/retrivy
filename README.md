@@ -133,3 +133,19 @@ Lo script genera un report HTML con:
 - link primario e riferimenti espandibili
 
 Se non viene indicato `--output`, il file viene creato con un nome automatico basato su scanner e timestamp.
+
+## Test
+
+Installa le dipendenze di sviluppo:
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+Esegui i test:
+
+```bash
+pytest
+```
+
+La CI GitHub Actions esegue compilazione Python e test su Linux e Windows.
