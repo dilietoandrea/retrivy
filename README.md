@@ -1,44 +1,135 @@
-
 # RETRIVY
 
-Tool per generare report di vulnerabilità utilizzando il risultato di una scansione con trivy o grype.
+Tool per generare report HTML di vulnerabilità a partire dal risultato JSON di una scansione con Trivy o Grype.
 
-## SUPPORTED SCANNERS
+## Scanner supportati
 
-- **[Trivy](https://trivy.dev)**
-- **[Grype](https://github.com/anchore/grype)**
+- [Trivy](https://trivy.dev)
+- [Grype](https://github.com/anchore/grype)
 
+## Installazione
 
-## INPUT
-
-`results.json`
-  - File json risultato della scansione con trivy
-  - Comando di scansione:
-    ```bash
-    trivy fs --scanners vuln --format json -o results.json .
-    ```
-	
-	oppure
-	
-	```bash
-	grype . -o json > results_grype.json
-	```
-  	Con questo comando trivy (o grype) cercherà nella cartella corrente i file di gestione delle dipendenze (requirements.txt, composer.lock, ...) riportando le vulnerabilità individuate nel file results.json
-
-    L'elenco dei file individuabili nel filesystem scanning è disponibilie nella documentazione ufficiale
-	trivy:
-    https://trivy.dev/latest/docs/coverage/language/
-	
-	grye:
-	https://github.com/anchore/grype
-
-## OUTPUT
-
-`File html` 
-  - Report in formato html sulle vulnerabilità individuate in results.json
-
-## UTILIZZO
+Uso consigliato: lascia creare l'ambiente virtuale al runner del progetto.
 
 ```bash
-python retrivy.py
+python run.py --input "input examples/results.json" --output report.html
 ```
+
+Alla prima esecuzione viene creata la cartella `.venv/` e vengono installate le dipendenze di `requirements.txt`.
+
+Installazione manuale alternativa:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Installazione scanner
+
+Trivy e Grype non sono librerie Python, quindi vengono installati separatamente nella cartella locale `.tools/`.
+
+Per installare o aggiornare entrambi all'ultima release disponibile su GitHub:
+
+```bash
+python install_tools.py
+```
+
+Per vedere cosa verrebbe installato senza scaricare nulla:
+
+```bash
+python install_tools.py --dry-run
+```
+
+Gli eseguibili vengono salvati in `.tools/bin/`. Su Windows puoi usarli cosi':
+
+```bash
+.\.tools\bin\trivy.exe --version
+.\.tools\bin\grype.exe version
+```
+
+L'installer scarica gli archivi dagli asset ufficiali GitHub della release piu' recente e verifica lo SHA256 usando il file `checksums.txt` pubblicato nella stessa release.
+
+Esempio di scansione con Trivy:
+
+```bash
+.\.tools\bin\trivy.exe fs --scanners vuln --format json -o results.json .
+python run.py --input results.json --output report.html
+```
+
+Esempio di scansione con Grype:
+
+```bash
+.\.tools\bin\grype.exe . -o json > results_grype.json
+python run.py --input results_grype.json --output report.html
+```
+
+## Input
+
+RETRIVY legge un file JSON prodotto da Trivy o Grype.
+
+Esempio con Trivy:
+
+```bash
+trivy fs --scanners vuln --format json -o results.json .
+```
+
+Esempio con Grype:
+
+```bash
+grype . -o json > results_grype.json
+```
+
+Entrambi gli scanner cercano nel filesystem file di gestione delle dipendenze, come `requirements.txt`, `composer.lock` e altri manifest supportati.
+
+Documentazione utile:
+
+- Trivy filesystem/language coverage: <https://trivy.dev/latest/docs/coverage/language/>
+- Grype: <https://github.com/anchore/grype>
+
+## Utilizzo
+
+Uso completo consigliato: installa lo scanner se manca, esegue la scansione e crea il report HTML.
+
+```bash
+python scan.py --scanner trivy --target . --report report.html
+```
+
+Con Grype:
+
+```bash
+python scan.py --scanner grype --target . --report report.html
+```
+
+Per salvare anche il JSON grezzo dello scanner:
+
+```bash
+python scan.py --scanner trivy --target . --json-output results.json --report report.html
+```
+
+Uso base, con `results.json` nella root del progetto:
+
+```bash
+python run.py
+```
+
+Uso con input e output espliciti:
+
+```bash
+python run.py --input "input examples/results.json" --output report.html
+```
+
+Opzioni disponibili:
+
+```bash
+python run.py --help
+```
+
+## Output
+
+Lo script genera un report HTML con:
+
+- vulnerabilità raggruppate per target
+- conteggio per severità
+- tabella ordinabile
+- link primario e riferimenti espandibili
+
+Se non viene indicato `--output`, il file viene creato con un nome automatico basato su scanner e timestamp.

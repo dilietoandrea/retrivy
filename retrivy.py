@@ -1,11 +1,49 @@
+import argparse
 import json
-import chardet
+import html
 import os
 import logging
-from datetime import datetime, timezone
+import re
+from datetime import datetime
+from urllib.parse import urlparse
+
+try:
+    import chardet
+except ImportError:
+    chardet = None
 
 # Configurazione del logging per mostrare messaggi di info e warning.
 logging.basicConfig(level=logging.INFO)
+
+SEVERITY_LEVELS = ("UNKNOWN", "LOW", "MEDIUM", "HIGH", "CRITICAL")
+SAFE_URL_SCHEMES = {"http", "https"}
+
+
+def escape_html(value) -> str:
+    """Converte un valore in testo HTML sicuro."""
+    return html.escape(str(value), quote=True)
+
+
+def normalize_severity(value: str) -> str:
+    severity = str(value or "UNKNOWN").upper()
+    return severity if severity in SEVERITY_LEVELS else "UNKNOWN"
+
+
+def safe_href(value: str) -> str:
+    url = str(value or "").strip()
+    parsed = urlparse(url)
+    if parsed.scheme.lower() in SAFE_URL_SCHEMES:
+        return url
+    return "#"
+
+
+def render_link(url: str) -> str:
+    if not url:
+        return "N/A"
+    label = escape_html(url)
+    href = escape_html(safe_href(url))
+    return f'<a href="{href}" rel="noopener noreferrer">{label}</a>'
+
 
 def validate_directories(*directories: str) -> bool:
     """
@@ -35,7 +73,7 @@ def load_file(file_path: str) -> str:
         str: Contenuto del file come stringa, o una stringa vuota se si verifica un errore.
     """
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             return file.read()
     except FileNotFoundError:
         logging.error(f"Errore: Il file '{file_path}' non è stato trovato.")
@@ -54,7 +92,16 @@ def format_date(iso_string: str) -> str:
         str: Data formattata in "YYYY-MM-DD HH:MM:SS" o un messaggio di errore se non valida.
     """
     try:
-        date_time = datetime.fromisoformat(iso_string)
+        if not iso_string:
+            return "Data non disponibile"
+
+        normalized_date = str(iso_string).replace("Z", "+00:00")
+        normalized_date = re.sub(
+            r"(\.\d{6})\d+([+-]\d{2}:\d{2})?$",
+            r"\1\2",
+            normalized_date
+        )
+        date_time = datetime.fromisoformat(normalized_date)
         return date_time.strftime("%Y-%m-%d %H:%M:%S")
     except (ValueError, TypeError):
         logging.error("Errore: Formato di data ISO non valido.")
@@ -72,21 +119,22 @@ def generate_table_rows(vulnerabilities):
     """
     rows = []
     for v in vulnerabilities:
-        pkg_name = v.get("PkgName", "Unknown Package")
-        vuln_id = v.get("VulnerabilityID", "Unknown ID")
-        severity = v.get("Severity", "UNKNOWN").upper()  # Assicura che sia maiuscolo
-        installed_version = v.get("InstalledVersion", "Unknown Version")
-        fixed_version = v.get("FixedVersion", "N/A")
-        title = v.get("Title", "No description available.")
+        pkg_name = escape_html(v.get("PkgName", "Unknown Package"))
+        vuln_id = escape_html(v.get("VulnerabilityID", "Unknown ID"))
+        severity = normalize_severity(v.get("Severity", "UNKNOWN"))
+        installed_version = escape_html(v.get("InstalledVersion", "Unknown Version"))
+        fixed_version = escape_html(v.get("FixedVersion", "N/A"))
+        title = escape_html(v.get("Title", "No description available."))
         primary_url = v.get("PrimaryURL", "#")
         references = v.get("References", [])
-        purl = v.get("PURL", "N/A")
+        purl = escape_html(v.get("PURL", "N/A"))
 
         # Mappa le classi CSS per garantire la colorazione corretta
         severity_class = f"severity-{severity}"
 
         # Crea la riga HTML con i riferimenti multipli
-        references_html = "<br>".join(f'<a href="{link}">{link}</a>' for link in references) if references else "N/A"
+        references_html = "<br>".join(render_link(link) for link in references) if references else "N/A"
+        primary_url_html = render_link(primary_url)
 
         row_html = f"""
         <tr class="{severity_class}">
@@ -97,7 +145,7 @@ def generate_table_rows(vulnerabilities):
             <td class="centered">{fixed_version}</td>
             <td>
                 <strong>{title}</strong><br>
-                <a href="{primary_url}">{primary_url}</a>
+                {primary_url_html}
                 <div onclick="toggleReferences(this)" class="show-references" style="cursor: pointer; text-decoration: underline;">
                     Show References
                 </div>
@@ -127,10 +175,9 @@ def generate_html_report(vulnerabilities, report_title, results_target, results_
     Returns:
         str: Contenuto HTML come stringa.
     """
-    severity_counts = {'UNKNOWN': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0, 'CRITICAL': 0}
+    severity_counts = {level: 0 for level in SEVERITY_LEVELS}
     for v in vulnerabilities:
-        if v['Severity'] in severity_counts:
-            severity_counts[v['Severity']] += 1
+        severity_counts[normalize_severity(v.get('Severity'))] += 1
     
     total_vulnerabilities = sum(severity_counts.values())
     summary_line = f"Total vulnerabilities: {total_vulnerabilities} (UNKNOWN: {severity_counts['UNKNOWN']}, LOW: {severity_counts['LOW']}, MEDIUM: {severity_counts['MEDIUM']}, HIGH: {severity_counts['HIGH']}, CRITICAL: {severity_counts['CRITICAL']})"
@@ -140,19 +187,23 @@ def generate_html_report(vulnerabilities, report_title, results_target, results_
     toggleReferences_js_code = load_file(os.path.join(js_directory, 'toggleReferences.js'))
 
     rows = generate_table_rows(vulnerabilities)
+    escaped_report_title = escape_html(report_title)
+    escaped_results_target = escape_html(results_target)
+    escaped_results_type = escape_html(results_type)
+    escaped_created_at = escape_html(formatted_json_created_at)
     
     html_report = f"""
 <!DOCTYPE html>
 <html>
 <head>
     <style>{css_code}</style>
-    <title>{report_title}</title>
+    <title>{escaped_report_title}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
-    <h1>{report_title}</h1>
-    <p><strong>JSON generated on {formatted_json_created_at}</strong></p>
-    <p><strong>Target: {results_target}&emsp;&emsp;Type: {results_type}</strong></p>
+    <h1>{escaped_report_title}</h1>
+    <p><strong>JSON generated on {escaped_created_at}</strong></p>
+    <p><strong>Target: {escaped_results_target}&emsp;&emsp;Type: {escaped_results_type}</strong></p>
     <p><strong>{summary_line}</strong></p>
     <table id="sortable-table">
         <thead>
@@ -190,15 +241,10 @@ def generate_html_section(vulnerabilities, target, analysis_type, table_index):
         str: Stringa HTML della sezione.
     """
     # Conta le vulnerabilità per livello di severità
-    severity_levels = ["UNKNOWN", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
-    severity_counts = {level: 0 for level in severity_levels}
+    severity_counts = {level: 0 for level in SEVERITY_LEVELS}
 
     for v in vulnerabilities:
-        severity = v.get("Severity", "UNKNOWN").upper()
-        if severity in severity_counts:
-            severity_counts[severity] += 1
-        else:
-            severity_counts["UNKNOWN"] += 1  # Se il valore non è riconosciuto, lo considera come UNKNOWN
+        severity_counts[normalize_severity(v.get("Severity", "UNKNOWN"))] += 1
 
     # Calcola il totale delle vulnerabilità
     total_vulnerabilities = sum(severity_counts.values())
@@ -214,11 +260,13 @@ def generate_html_section(vulnerabilities, target, analysis_type, table_index):
     # Genera le righe della tabella
     rows = generate_table_rows(vulnerabilities)
     table_id = f"sortable-table-{table_index}"  # ID univoco per ogni tabella
+    escaped_target = escape_html(target)
+    escaped_analysis_type = escape_html(analysis_type)
 
     return f"""
     <section>
         <div style="margin-top: 60px;"></div> <!-- Spazio prima di Target -->
-        <h2>Target: {target} (Type: {analysis_type})</h2>
+        <h2>Target: {escaped_target} (Type: {escaped_analysis_type})</h2>
         <p class="summary">{summary_line}</p>
         <table id="{table_id}" class="sortable-table">
             <thead>
@@ -248,18 +296,20 @@ def generate_full_html_report(sections, report_title, css_directory, js_director
     toggleReferences_js_code = load_file(os.path.join(js_directory, 'toggleReferences.js'))
 
     sections_html = "".join(sections)
+    escaped_report_title = escape_html(report_title)
+    escaped_created_at = escape_html(formatted_json_created_at)
 
     return f"""
     <!DOCTYPE html>
     <html>
     <head>
         <style>{css_code}</style>
-        <title>{report_title}</title>
+        <title>{escaped_report_title}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     </head>
     <body>
-        <h1>{report_title}</h1>
-        <p><strong>JSON generated on {formatted_json_created_at}</strong></p>
+        <h1>{escaped_report_title}</h1>
+        <p><strong>JSON generated on {escaped_created_at}</strong></p>
         {sections_html}
         <script>{toggleReferences_js_code}</script>
         <script>{sortable_js_code}</script>
@@ -284,10 +334,12 @@ def parse_trivy_json(data):
         vulnerabilities = []
 
         for vuln in result.get('Vulnerabilities', []):
+            pkg_identifier = vuln.get("PkgIdentifier", {})
             vuln_data = {
                 "PkgName": vuln.get("PkgName", "Unknown Package"),
+                "PURL": pkg_identifier.get("PURL", "N/A"),
                 "VulnerabilityID": vuln.get("VulnerabilityID", "Unknown ID"),
-                "Severity": vuln.get("Severity", "UNKNOWN"),
+                "Severity": normalize_severity(vuln.get("Severity", "UNKNOWN")),
                 "InstalledVersion": vuln.get("InstalledVersion", "Unknown Version"),
                 "FixedVersion": vuln.get("FixedVersion", "N/A"),
                 "PrimaryURL": vuln.get("PrimaryURL", "N/A"),
@@ -326,7 +378,7 @@ def parse_grype_json(data, max_description_length=200):
 
         for vuln in vulnerabilities_data:
             vuln_id = vuln.get('id', 'Unknown ID')
-            severity = vuln.get('severity', 'UNKNOWN')
+            severity = normalize_severity(vuln.get('severity', 'UNKNOWN'))
             fix_versions = vuln.get('fix', {}).get('versions', [])
             fixed_version = fix_versions[0] if fix_versions else 'N/A'
             primary_url = vuln.get('dataSource', 'N/A')
@@ -375,17 +427,32 @@ def read_json_input(file_path: str):
         list: Lista di tuple contenenti dati sulle vulnerabilità, target, tipo e data di creazione.
     """
     try:
-        # Rileva la codifica leggendo solo i primi byte del file
-        with open(file_path, 'rb') as raw_file:
-            raw_data = raw_file.read(10000)  # Legge i primi 10KB per l'analisi
-            detected_encoding = chardet.detect(raw_data)['encoding']
+        detected_encoding = None
+        if chardet:
+            # Rileva la codifica leggendo solo i primi byte del file
+            with open(file_path, 'rb') as raw_file:
+                raw_data = raw_file.read(10000)  # Legge i primi 10KB per l'analisi
+                detected_encoding = chardet.detect(raw_data)['encoding']
 
-        # Se la codifica non è stata rilevata, usa UTF-8 come fallback
-        encoding_to_use = detected_encoding if detected_encoding else 'utf-8'
+        encodings_to_try = []
+        if detected_encoding and detected_encoding.lower() not in {"ascii", "utf-8"}:
+            encodings_to_try.append(detected_encoding)
+        encodings_to_try.extend(["utf-8", "utf-8-sig"])
 
-        # Ora leggiamo il file con la codifica rilevata
-        with open(file_path, 'r', encoding=encoding_to_use) as file:
-            data = json.load(file)
+        last_decode_error = None
+        data = None
+        for encoding_to_use in encodings_to_try:
+            try:
+                with open(file_path, 'r', encoding=encoding_to_use) as file:
+                    data = json.load(file)
+                break
+            except UnicodeDecodeError as exc:
+                last_decode_error = exc
+
+        if data is None:
+            raise ValueError(
+                f"Il file '{file_path}' non puo' essere letto con codifica supportata: {last_decode_error}"
+            )
 
         # Determina il formato del file JSON e chiama il parser corretto
         if 'Results' in data:
@@ -397,24 +464,22 @@ def read_json_input(file_path: str):
             logging.info(f"Formato JSON riconosciuto: {scanner_tool}")
             return parse_grype_json(data),scanner_tool
         else:
-            logging.error("Formato JSON non riconosciuto. Verifica che il file sia corretto.")
-            return []
+            raise ValueError("Formato JSON non riconosciuto. Verifica che il file sia un output Trivy o Grype.")
 
     except FileNotFoundError:
-        logging.error(f"Errore: Il file '{file_path}' non è stato trovato.")
-        return []
-    except json.JSONDecodeError:
-        logging.error(f"Errore: Il file '{file_path}' non è un JSON valido.")
-        return []
+        raise FileNotFoundError(f"Il file '{file_path}' non e' stato trovato.")
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Il file '{file_path}' non e' un JSON valido: {exc}") from exc
+    except ValueError:
+        raise
     except Exception as e:
-        logging.error(f"Errore imprevisto durante la lettura del file '{file_path}': {e}")
-        return []
+        raise RuntimeError(f"Errore imprevisto durante la lettura del file '{file_path}': {e}") from e
 
-def main(json_file_path: str, css_directory: str, js_directory: str):
+def main(json_file_path: str, css_directory: str, js_directory: str, output_html_path: str = None):
     """
     Esegue il processo di generazione di un unico report HTML con separazione per target.
     """
-    results_list,scanner_tool = read_json_input(json_file_path)
+    results_list, scanner_tool = read_json_input(json_file_path)
 
     sections = []
     json_created_at = None
@@ -434,8 +499,13 @@ def main(json_file_path: str, css_directory: str, js_directory: str):
     formatted_json_created_at = format_date(json_created_at)
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     report_title = f"{scanner_tool} Report - {timestamp}"
-    output_html_filename = f"{scanner_tool.lower().replace(' ', '_')}_report_{timestamp}.html"
-    output_html_path = f"./{output_html_filename}"
+    if output_html_path is None:
+        output_html_filename = f"{scanner_tool.lower().replace(' ', '_')}_report_{timestamp}.html"
+        output_html_path = f"./{output_html_filename}"
+    else:
+        output_directory = os.path.dirname(os.path.abspath(output_html_path))
+        if output_directory:
+            os.makedirs(output_directory, exist_ok=True)
 
     full_html_report = generate_full_html_report(
         sections,
@@ -445,17 +515,54 @@ def main(json_file_path: str, css_directory: str, js_directory: str):
         formatted_json_created_at
     )
 
-    with open(output_html_path, 'w') as file:
+    with open(output_html_path, 'w', encoding='utf-8') as file:
         file.write(full_html_report)
 
     logging.info(f"Report separato per target salvato in {output_html_path}")
+    return output_html_path
 
-# Percorsi dei file e directory richiesti
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Genera un report HTML da un file JSON prodotto da Trivy o Grype."
+    )
+    parser.add_argument(
+        "-i",
+        "--input",
+        default="results.json",
+        help="Percorso del JSON di input. Default: results.json"
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Percorso del file HTML di output. Default: nome automatico con timestamp."
+    )
+    parser.add_argument(
+        "--css-dir",
+        default="css",
+        help="Directory contenente style.css. Default: css"
+    )
+    parser.add_argument(
+        "--js-dir",
+        default="js",
+        help="Directory contenente sortable.js e toggleReferences.js. Default: js"
+    )
+    return parser.parse_args()
+
+
+def cli() -> int:
+    args = parse_args()
+
+    if not validate_directories(args.css_dir, args.js_dir):
+        return 1
+
+    try:
+        main(args.input, args.css_dir, args.js_dir, args.output)
+    except (FileNotFoundError, ValueError, RuntimeError, OSError) as exc:
+        logging.error(exc)
+        return 1
+
+    return 0
+
+
 if __name__ == "__main__":
-    css_directory = 'css/'
-    js_directory = 'js/'
-    json_file_path = 'results.json'
-
-    # Controlla se le directory CSS e JS esistono prima di generare il report
-    if validate_directories(css_directory, js_directory):
-        main(json_file_path, css_directory, js_directory)
+    raise SystemExit(cli())
