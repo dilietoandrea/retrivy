@@ -35,6 +35,24 @@ def test_install_tools_help_runs():
     assert "--force" in result.stdout
 
 
+def test_default_output_paths_include_reports_target_scanner():
+    json_path, report_path = scan.default_output_paths(
+        "trivy",
+        r"input examples\classifica-film-2.8.0",
+        "20260423-153000",
+    )
+
+    assert json_path == scan.REPORTS_DIR / "classifica-film-2.8.0-trivy-20260423-153000.json"
+    assert report_path == scan.REPORTS_DIR / "classifica-film-2.8.0-trivy-20260423-153000.html"
+
+
+def test_default_output_paths_use_repo_name_for_current_directory():
+    json_path, report_path = scan.default_output_paths("grype", ".", "20260423-153000")
+
+    assert json_path == scan.REPORTS_DIR / f"{scan.ROOT_DIR.name}-grype-20260423-153000.json"
+    assert report_path == scan.REPORTS_DIR / f"{scan.ROOT_DIR.name}-grype-20260423-153000.html"
+
+
 def test_install_tool_dry_run_does_not_download(monkeypatch, capsys):
     fake_release = {
         "tag_name": "v1.2.3",

@@ -3,6 +3,7 @@ report.html
 /results.json
 /results_grype.json
 /scan-results*.json
+reports/
 .venv/
 .tools/
 .pytest_cache/

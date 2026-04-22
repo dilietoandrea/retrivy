@@ -1,6 +1,7 @@
 import argparse
+import re
 import subprocess
-import tempfile
+from datetime import datetime
 from pathlib import Path
 
 import retrivy
@@ -8,6 +9,7 @@ from install_tools import BIN_DIR, executable_name, install_tool
 
 
 ROOT_DIR = Path(__file__).resolve().parent
+REPORTS_DIR = ROOT_DIR / "reports"
 DEFAULT_SKIP_PATHS = (".venv", ".tools", "__pycache__")
 
 
@@ -38,6 +40,30 @@ def resolve_output_path(path_value: str) -> Path:
         path = ROOT_DIR / path
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def slugify(value: str) -> str:
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", value).strip("-._").lower()
+    return slug or "scan"
+
+
+def target_label(target: str) -> str:
+    normalized = str(target).rstrip("\\/")
+    if normalized in {"", "."}:
+        return ROOT_DIR.name
+
+    parts = re.split(r"[\\/]+", normalized)
+    return parts[-1] if parts[-1] else normalized
+
+
+def timestamp_for_filename() -> str:
+    return datetime.now().strftime("%Y%m%d-%H%M%S")
+
+
+def default_output_paths(scanner: str, target: str, timestamp: str | None = None) -> tuple[Path, Path]:
+    stamp = timestamp or timestamp_for_filename()
+    base_name = f"{slugify(target_label(target))}-{scanner}-{stamp}"
+    return REPORTS_DIR / f"{base_name}.json", REPORTS_DIR / f"{base_name}.html"
 
 
 def run_trivy(scanner_path: Path, target: str, json_output: Path, skip_paths: list[str]) -> None:
@@ -119,12 +145,11 @@ def parse_args():
     )
     parser.add_argument(
         "--report",
-        default="report.html",
-        help="Percorso del report HTML da generare. Default: report.html"
+        help="Percorso del report HTML da generare. Default: reports/<target>-<scanner>-<timestamp>.html"
     )
     parser.add_argument(
         "--json-output",
-        help="Salva anche il JSON grezzo dello scanner nel percorso indicato."
+        help="Percorso del JSON grezzo dello scanner. Default: reports/<target>-<scanner>-<timestamp>.json"
     )
     parser.add_argument(
         "--no-install",
@@ -147,19 +172,15 @@ def parse_args():
 def main() -> int:
     args = parse_args()
     scanner_path = ensure_scanner(args.scanner, args.no_install, args.update_tools)
-    report_output = resolve_output_path(args.report)
+    default_json_output, default_report_output = default_output_paths(args.scanner, args.target)
+    report_output = resolve_output_path(args.report) if args.report else resolve_output_path(str(default_report_output))
+    json_output = resolve_output_path(args.json_output) if args.json_output else resolve_output_path(str(default_json_output))
     skip_paths = [] if args.include_tool_dirs else list(DEFAULT_SKIP_PATHS)
 
-    if args.json_output:
-        json_output = resolve_output_path(args.json_output)
-        run_scan(args.scanner, scanner_path, args.target, json_output, skip_paths)
-        generate_report(json_output, report_output)
-    else:
-        with tempfile.TemporaryDirectory() as temp_dir:
-            json_output = Path(temp_dir) / f"{args.scanner}-results.json"
-            run_scan(args.scanner, scanner_path, args.target, json_output, skip_paths)
-            generate_report(json_output, report_output)
+    run_scan(args.scanner, scanner_path, args.target, json_output, skip_paths)
+    generate_report(json_output, report_output)
 
+    print(f"JSON generato: {json_output}")
     print(f"Report generato: {report_output}")
     return 0
 
