@@ -40,6 +40,24 @@ def test_parse_trivy_json_normalizes_vulnerabilities():
     assert vulnerabilities[0]["Severity"] == "HIGH"
 
 
+def test_parse_trivy_json_handles_metadata_only_report():
+    data = {
+        "SchemaVersion": 2,
+        "Trivy": {"Version": "0.70.0"},
+        "CreatedAt": "2026-04-22T19:00:00Z",
+        "ArtifactName": "input examples/classifica-film-2.8.0",
+        "ArtifactType": "filesystem",
+    }
+
+    results = retrivy.parse_trivy_json(data)
+
+    vulnerabilities, target, analysis_type, created_at = results[0]
+    assert vulnerabilities == []
+    assert target == "input examples/classifica-film-2.8.0"
+    assert analysis_type == "filesystem"
+    assert created_at == "2026-04-22T19:00:00Z"
+
+
 def test_parse_grype_json_groups_vulnerabilities_by_location():
     data = {
         "descriptor": {"timestamp": "2026-04-22T19:00:00Z"},
