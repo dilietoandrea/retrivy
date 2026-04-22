@@ -1,4 +1,5 @@
 report.html
 *_report_*.html
+.venv/
 __pycache__/
 *.py[cod]

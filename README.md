@@ -9,6 +9,16 @@ Tool per generare report HTML di vulnerabilità a partire dal risultato JSON di 
 
 ## Installazione
 
+Uso consigliato: lascia creare l'ambiente virtuale al runner del progetto.
+
+```bash
+python run.py --input "input examples/results.json" --output report.html
+```
+
+Alla prima esecuzione viene creata la cartella `.venv/` e vengono installate le dipendenze di `requirements.txt`.
+
+Installazione manuale alternativa:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -41,19 +51,19 @@ Documentazione utile:
 Uso base, con `results.json` nella root del progetto:
 
 ```bash
-python retrivy.py
+python run.py
 ```
 
 Uso con input e output espliciti:
 
 ```bash
-python retrivy.py --input "input examples/results.json" --output report.html
+python run.py --input "input examples/results.json" --output report.html
 ```
 
 Opzioni disponibili:
 
 ```bash
-python retrivy.py --help
+python run.py --help
 ```
 
 ## Output
