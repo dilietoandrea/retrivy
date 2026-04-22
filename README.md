@@ -87,19 +87,26 @@ Documentazione utile:
 
 ## Utilizzo
 
-Uso completo consigliato: installa lo scanner se manca, esegue la scansione e crea il report HTML.
+Uso completo consigliato: installa lo scanner se manca, esegue la scansione e crea JSON + report HTML nella cartella `reports/`.
 
 ```bash
-python scan.py --scanner trivy --target . --report report.html
+python scan.py --scanner trivy --target "input examples/classifica-film-2.8.0"
 ```
 
 Con Grype:
 
 ```bash
-python scan.py --scanner grype --target . --report report.html
+python scan.py --scanner grype --target "input examples/classifica-film-2.8.0"
 ```
 
-Per salvare anche il JSON grezzo dello scanner:
+I file generati avranno un nome simile a:
+
+```text
+reports/classifica-film-2.8.0-trivy-20260423-153000.json
+reports/classifica-film-2.8.0-trivy-20260423-153000.html
+```
+
+Per scegliere manualmente i percorsi di output:
 
 ```bash
 python scan.py --scanner trivy --target . --json-output results.json --report report.html
@@ -132,7 +139,9 @@ Lo script genera un report HTML con:
 - tabella ordinabile
 - link primario e riferimenti espandibili
 
-Se non viene indicato `--output`, il file viene creato con un nome automatico basato su scanner e timestamp.
+Con `scan.py`, se non vengono indicati `--json-output` e `--report`, i file vengono creati in `reports/` con nome automatico basato su target, scanner e timestamp. La cartella `reports/` e' ignorata da Git, quindi puoi generare report locali senza sporcare i commit.
+
+Con `run.py`, se non viene indicato `--output`, il file viene creato con un nome automatico basato su scanner e timestamp.
 
 ## Test
 
