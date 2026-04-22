@@ -20,6 +20,7 @@ def test_scan_help_runs():
 
     assert "--scanner" in result.stdout
     assert "--report" in result.stdout
+    assert "--open" in result.stdout
 
 
 def test_install_tools_help_runs():
@@ -51,6 +52,21 @@ def test_default_output_paths_use_repo_name_for_current_directory():
 
     assert json_path == scan.REPORTS_DIR / f"{scan.ROOT_DIR.name}-grype-20260423-153000.json"
     assert report_path == scan.REPORTS_DIR / f"{scan.ROOT_DIR.name}-grype-20260423-153000.html"
+
+
+def test_open_report_uses_file_uri(monkeypatch, tmp_path):
+    opened = {}
+    report_path = tmp_path / "report.html"
+    report_path.write_text("<html></html>", encoding="utf-8")
+
+    def fake_open(url):
+        opened["url"] = url
+        return True
+
+    monkeypatch.setattr(scan.webbrowser, "open", fake_open)
+
+    assert scan.open_report(report_path) is True
+    assert opened["url"] == report_path.resolve().as_uri()
 
 
 def test_install_tool_dry_run_does_not_download(monkeypatch, capsys):
