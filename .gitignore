@@ -1,5 +1,8 @@
 report.html
 *_report_*.html
+/results.json
+/results_grype.json
+/scan-results*.json
 .venv/
 .tools/
 __pycache__/

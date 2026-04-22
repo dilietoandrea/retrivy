@@ -434,12 +434,25 @@ def read_json_input(file_path: str):
                 raw_data = raw_file.read(10000)  # Legge i primi 10KB per l'analisi
                 detected_encoding = chardet.detect(raw_data)['encoding']
 
-        # Se la codifica non è stata rilevata, usa UTF-8 come fallback
-        encoding_to_use = detected_encoding if detected_encoding else 'utf-8'
+        encodings_to_try = []
+        if detected_encoding and detected_encoding.lower() not in {"ascii", "utf-8"}:
+            encodings_to_try.append(detected_encoding)
+        encodings_to_try.extend(["utf-8", "utf-8-sig"])
 
-        # Ora leggiamo il file con la codifica rilevata
-        with open(file_path, 'r', encoding=encoding_to_use) as file:
-            data = json.load(file)
+        last_decode_error = None
+        data = None
+        for encoding_to_use in encodings_to_try:
+            try:
+                with open(file_path, 'r', encoding=encoding_to_use) as file:
+                    data = json.load(file)
+                break
+            except UnicodeDecodeError as exc:
+                last_decode_error = exc
+
+        if data is None:
+            raise ValueError(
+                f"Il file '{file_path}' non puo' essere letto con codifica supportata: {last_decode_error}"
+            )
 
         # Determina il formato del file JSON e chiama il parser corretto
         if 'Results' in data:
@@ -457,8 +470,6 @@ def read_json_input(file_path: str):
         raise FileNotFoundError(f"Il file '{file_path}' non e' stato trovato.")
     except json.JSONDecodeError as exc:
         raise ValueError(f"Il file '{file_path}' non e' un JSON valido: {exc}") from exc
-    except UnicodeDecodeError as exc:
-        raise ValueError(f"Il file '{file_path}' non puo' essere letto con codifica {encoding_to_use}: {exc}") from exc
     except ValueError:
         raise
     except Exception as e:

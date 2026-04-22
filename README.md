@@ -87,6 +87,24 @@ Documentazione utile:
 
 ## Utilizzo
 
+Uso completo consigliato: installa lo scanner se manca, esegue la scansione e crea il report HTML.
+
+```bash
+python scan.py --scanner trivy --target . --report report.html
+```
+
+Con Grype:
+
+```bash
+python scan.py --scanner grype --target . --report report.html
+```
+
+Per salvare anche il JSON grezzo dello scanner:
+
+```bash
+python scan.py --scanner trivy --target . --json-output results.json --report report.html
+```
+
 Uso base, con `results.json` nella root del progetto:
 
 ```bash
