@@ -1,6 +1,7 @@
 import argparse
 import re
 import subprocess
+import webbrowser
 from datetime import datetime
 from pathlib import Path
 
@@ -128,6 +129,10 @@ def generate_report(json_output: Path, report_output: Path) -> None:
     )
 
 
+def open_report(report_output: Path) -> bool:
+    return webbrowser.open(report_output.resolve().as_uri())
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Esegue una scansione Trivy/Grype e genera subito il report HTML."
@@ -166,6 +171,12 @@ def parse_args():
         action="store_true",
         help="Non esclude .venv, .tools e __pycache__ dalla scansione."
     )
+    parser.add_argument(
+        "--open",
+        dest="open_report",
+        action="store_true",
+        help="Apre il report HTML generato nel browser predefinito."
+    )
     return parser.parse_args()
 
 
@@ -182,6 +193,11 @@ def main() -> int:
 
     print(f"JSON generato: {json_output}")
     print(f"Report generato: {report_output}")
+    if args.open_report:
+        if open_report(report_output):
+            print(f"Report aperto: {report_output}")
+        else:
+            print(f"Non sono riuscito ad aprire automaticamente il report: {report_output}")
     return 0
 
 

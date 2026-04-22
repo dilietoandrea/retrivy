@@ -112,6 +112,12 @@ Per scegliere manualmente i percorsi di output:
 python scan.py --scanner trivy --target . --json-output results.json --report report.html
 ```
 
+Per aprire automaticamente il report HTML appena generato:
+
+```bash
+python scan.py --scanner trivy --target "input examples/classifica-film-2.8.0" --open
+```
+
 Uso base, con `results.json` nella root del progetto:
 
 ```bash
